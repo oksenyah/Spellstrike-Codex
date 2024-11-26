@@ -100,4 +100,11 @@ public class Enemy : MonoBehaviour {
         }
     }
 
+    // Pathfinding
+
+    float HeuristicCostEstimate(Vector2 start, Vector2 goal) {
+        // AKA Manhattan Distance
+        return Mathf.Abs(start.x -goal.x) + Mathf.Abs(start.y - goal.y);
+    }
+
 }
