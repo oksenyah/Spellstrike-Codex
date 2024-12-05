@@ -21,10 +21,10 @@ public class Cell : MonoBehaviour {
     private bool isRoomCandidate = false;
 
     void Awake() {
-        // BuildWalls();
-        // AddDoor(new Vector3(1f, 1f));
-        // AddDoor(new Vector3(0.7f, 0.4875f));
-        // AddDoor(new Vector3(1.3f, 0.4875f));
+        BuildWalls();
+        // AddDoor(new Vector3(1f, 0.5f));
+        AddDoor(new Vector3(0.7f, 0.5f));
+        AddDoor(new Vector3(1.3f, 0.5f));
     }
 
     public void SetDimensions(float width, float height) {
@@ -170,7 +170,7 @@ public class Cell : MonoBehaviour {
     }
 
     public void BuildWalls() {
-        float wallOffset = wallThickness / 2 / 100;
+        float wallOffset = GetWallThickness() / 2;
         Debug.Log("Wall Offset: " + wallOffset);
         Vector3 topWallPosition = transform.position + new Vector3(0, (GetLength() / 2) - wallOffset);
         Vector3 bottomWallPosition = transform.position + new Vector3(0, (-GetLength() / 2) + wallOffset);
@@ -226,6 +226,6 @@ public class Cell : MonoBehaviour {
     }
 
     public float GetWallThickness() {
-        return wallThickness;
+        return wallThickness / 100;
     }
 }

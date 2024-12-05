@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,22 +15,29 @@ public class Wall : MonoBehaviour
 
     public bool IsWithinWall(Vector3 position, Cell parentCell) {
         bool isWithinWall = false;
+
+        // Debug.Log("Position to check, X: " + position.x + ", Y: " + position.y);
+        
         if (IsRotated()) {
-            float maxY = parentCell.transform.position.y + (parentCell.transform.localScale.y / 2);
-            float minY = parentCell.transform.position.y - (parentCell.transform.localScale.y / 2);
+            float maxX = transform.position.x + parentCell.GetWallThickness();
+            float minX = transform.position.x - parentCell.GetWallThickness();
+            float maxY = parentCell.transform.position.y + (parentCell.GetLength() / 2);
+            float minY = parentCell.transform.position.y - (parentCell.GetLength() / 2);
 
-            Debug.Log("Max Y: " + maxY + ", Min Y: " + minY + ", X: " + transform.position.x);
+            // Debug.Log("Max Y: " + maxY + ", Min Y: " + minY + ", Max X: " + maxX + ", Min X: " + minX + ", Wall Thickness: " + parentCell.GetWallThickness());
 
-            if (position.x == transform.position.x && minY <= position.y && position.y <= maxY) {
+            if (minX <= position.x && position.x <= maxX && minY <= position.y && position.y <= maxY) {
                 isWithinWall = true;
             }
         } else {
-            float maxX = parentCell.transform.position.x + (parentCell.transform.localScale.x / 2);
-            float minX = parentCell.transform.position.x - (parentCell.transform.localScale.x / 2);
+            float maxX = parentCell.transform.position.x + (parentCell.GetWidth() / 2);
+            float minX = parentCell.transform.position.x - (parentCell.GetWidth() / 2);
+            float maxY = transform.position.y + parentCell.GetWallThickness();
+            float minY = transform.position.y - parentCell.GetWallThickness();
 
-            Debug.Log("Max X: " + maxX + ", Min X: " + minX + ", Y: " + transform.position.y);
+            // Debug.Log("Max Y: " + maxY + ", Min Y: " + minY + ", Max X: " + maxX + ", Min X: " + minX + ", Wall Thickness: " + parentCell.GetWallThickness());
 
-            if (position.y == transform.position.y && minX <= position.x && position.x <= maxX) {
+            if (minX <= position.x && position.x <= maxX && minY <= position.y && position.y <= maxY) {
                 isWithinWall = true;
             }
         }
@@ -44,16 +52,19 @@ public class Wall : MonoBehaviour
         List<Wall> splitWalls = new List<Wall>();
         Vector3 rightWallPosition;
         Vector3 leftWallPosition;
+        float rightRemainder;
+        float leftRemainder;
         float rightScalePercentage;
         float leftScalePercentage;
         float rightTotalPercentage;
         float leftTotalPercentage;
         
+        
         if (IsRotated()) {
-            float maxY = parentCell.transform.position.y + (parentCell.transform.localScale.y / 2);
-            float minY = parentCell.transform.position.y - (parentCell.transform.localScale.y / 2);
-            float rightRemainder = maxY - position.y - (widthOfGap / 2);
-            float leftRemainder = position.y - minY - (widthOfGap / 2);
+            float maxY = parentCell.transform.position.y + (parentCell.GetLength() / 2);
+            float minY = parentCell.transform.position.y - (parentCell.GetLength() / 2);
+            rightRemainder = maxY - position.y - (widthOfGap / 2);
+            leftRemainder = position.y - minY - (widthOfGap / 2);
             rightScalePercentage = rightRemainder / (maxY - position.y);
             leftScalePercentage = leftRemainder / (position.y - minY);
             rightTotalPercentage = (maxY - position.y) / (maxY - minY);
@@ -66,10 +77,10 @@ public class Wall : MonoBehaviour
             rightWallPosition = new Vector3(transform.position.x, maxY - (rightRemainder / 2));
             leftWallPosition = new Vector3(transform.position.x, minY + (leftRemainder / 2));
         } else {
-            float maxX = parentCell.transform.position.x + (parentCell.transform.localScale.x / 2);
-            float minX = parentCell.transform.position.x - (parentCell.transform.localScale.x / 2);
-            float rightRemainder = maxX - position.x - (widthOfGap / 2);
-            float leftRemainder = position.x - minX - (widthOfGap / 2);
+            float maxX = parentCell.transform.position.x + (parentCell.GetWidth() / 2);
+            float minX = parentCell.transform.position.x - (parentCell.GetWidth() / 2);
+            rightRemainder = maxX - position.x - (widthOfGap / 2);
+            leftRemainder = position.x - minX - (widthOfGap / 2);
             rightScalePercentage = rightRemainder / (maxX - position.x);
             leftScalePercentage = leftRemainder / (position.x - minX);
             rightTotalPercentage = (maxX - position.x) / (maxX - minX);
@@ -86,21 +97,31 @@ public class Wall : MonoBehaviour
         Wall rightWall = Instantiate(this, rightWallPosition, Quaternion.identity);
         Wall leftWall = Instantiate(this, leftWallPosition, Quaternion.identity);
 
-        float rightWallScale = rightWall.transform.localScale.x * rightTotalPercentage * rightScalePercentage;
-        float leftWallScale = leftWall.transform.localScale.x * leftTotalPercentage * leftScalePercentage;
+        float rightWallScale = rightWall.GetWidth() * rightTotalPercentage * rightScalePercentage;
+        float leftWallScale = leftWall.GetWidth() * leftTotalPercentage * leftScalePercentage;
 
         Debug.Log("Right Scale Value: " + rightWallScale + ", Left Scale Value: " + leftWallScale);
 
-        rightWall.transform.localScale = new Vector3(rightWallScale, rightWall.transform.localScale.y);
-        leftWall.transform.localScale = new Vector3(leftWallScale, leftWall.transform.localScale.y);
+        rightWall.transform.localScale = new Vector3(rightWallScale, rightWall.GetLength());
+        leftWall.transform.localScale = new Vector3(leftWallScale, leftWall.GetLength());
 
         if (IsRotated()) {
             rightWall.Rotate();
             leftWall.Rotate();
         }
 
-        splitWalls.Add(rightWall);
-        splitWalls.Add(leftWall);
+        if (rightRemainder <= 0) {
+            // No wall left
+            Destroy(rightWall.gameObject);
+        } else {
+            splitWalls.Add(rightWall);
+        }
+        if (leftRemainder <= 0) {
+            // No wall left
+            Destroy(leftWall.gameObject);
+        } else {
+            splitWalls.Add(leftWall);
+        }
 
         Destroy(this.gameObject);
 
@@ -109,5 +130,13 @@ public class Wall : MonoBehaviour
 
     private bool IsRotated() {
         return transform.rotation.eulerAngles.z == 90;
+    }
+
+    public float GetWidth() {
+        return transform.localScale.x;
+    }
+
+    public float GetLength() {
+        return transform.localScale.y;
     }
 }
