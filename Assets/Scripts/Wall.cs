@@ -12,12 +12,36 @@ public class Wall : MonoBehaviour
         transform.localScale = new Vector3(100 * length, width);
     }
 
-    public HashSet<Wall> SplitWall(Vector3 position, float widthOfGap, Cell parentCell) {
+    public bool IsWithinWall(Vector3 position, Cell parentCell) {
+        bool isWithinWall = false;
+        if (IsRotated()) {
+            float maxY = parentCell.transform.position.y + (parentCell.transform.localScale.y / 2);
+            float minY = parentCell.transform.position.y - (parentCell.transform.localScale.y / 2);
+
+            Debug.Log("Max Y: " + maxY + ", Min Y: " + minY + ", X: " + transform.position.x);
+
+            if (position.x == transform.position.x && minY <= position.y && position.y <= maxY) {
+                isWithinWall = true;
+            }
+        } else {
+            float maxX = parentCell.transform.position.x + (parentCell.transform.localScale.x / 2);
+            float minX = parentCell.transform.position.x - (parentCell.transform.localScale.x / 2);
+
+            Debug.Log("Max X: " + maxX + ", Min X: " + minX + ", Y: " + transform.position.y);
+
+            if (position.y == transform.position.y && minX <= position.x && position.x <= maxX) {
+                isWithinWall = true;
+            }
+        }
+        return isWithinWall;
+    }
+
+    public List<Wall> SplitWall(Vector3 position, float widthOfGap, Cell parentCell) {
         Debug.Log("Target Position: (" + position.x + "," + position.y + ")");
         Debug.Log("Gap Width: " + widthOfGap);
 
         // widthOfGap / 2 + (remainder length of wall / 2)
-        HashSet<Wall> splitWalls = new HashSet<Wall>();
+        List<Wall> splitWalls = new List<Wall>();
         Vector3 rightWallPosition;
         Vector3 leftWallPosition;
         float rightScalePercentage;

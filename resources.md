@@ -23,3 +23,8 @@ The main menu background was generated with OpenAI.
 ## Lehmer Random Number Generator
 
 - <https://github.com/YourRobotOverlord/LehmerRandom/tree/master>
+
+## Kruskal's Minimum Spanning Tree Algorithm
+
+- <https://www.geeksforgeeks.org/kruskals-minimum-spanning-tree-algorithm-greedy-algo-2/>
+- <https://www.tutorialspoint.com/data_structures_algorithms/kruskals_spanning_tree_algorithm.htm>

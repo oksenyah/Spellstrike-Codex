@@ -2,6 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DelaunatorSharp;
+using DelaunatorSharp.Unity.Extensions;
+using System.Linq;
 
 public class DungeonGenerator : MonoBehaviour
 {
@@ -9,6 +12,7 @@ public class DungeonGenerator : MonoBehaviour
     private LehmerRandom lehmerRandom;
     private float spawnRadius;
     private List<GameObject> dungeonBlocks = new List<GameObject>();
+    private List<Cell> rooms = new List<Cell>();
 
     [Header("Audio")]
     [SerializeField] AudioSource welcomeToTheDungeonAudio;
@@ -88,16 +92,37 @@ public class DungeonGenerator : MonoBehaviour
 
                 if (overlapDetected) {
                     Debug.Log("Overlaps detected. Sleeping...");
-                    yield return new WaitForSeconds(0.001f);
+                    yield return new WaitForSeconds(0.0001f);
                 }
             }
 
+            List<IPoint> points = new List<IPoint>();
             foreach (GameObject dungeonBlock in dungeonBlocks) {
                 Cell cell = dungeonBlock.GetComponent<Cell>();
                 if (cell.IsRoomCandidate()) {
                     dungeonBlock.GetComponent<SpriteRenderer>().color = Color.green;
+                    cell.BuildWalls();
+                    rooms.Add(cell);
+                    points.Add(new Point(cell.transform.position.x, cell.transform.position.y));
+                } else {
+                    // Clean up dungeon blocks that aren't rooms
+                    Destroy(dungeonBlock);
                 }
             }
+
+            Delaunator delaunator = new Delaunator(points.ToArray());
+            // delaunator.ForEachTriangleEdge(edge => {
+            //     Debug.DrawLine(edge.P.ToVector3(), edge.Q.ToVector3(), Color.blue, float.PositiveInfinity);
+            // });
+
+            List<WeightedEdge> mstEdges = CalculateMST(delaunator);
+            foreach (WeightedEdge weightedEdge in mstEdges) {
+                Debug.Log("Source: " + weightedEdge.src + ", Destination: " + weightedEdge.dest);
+                Debug.DrawLine(weightedEdge.src.ToVector3(), weightedEdge.dest.ToVector3(), Color.blue, float.PositiveInfinity);
+
+                
+            }
+
             yield return null;
         }
     }
@@ -123,6 +148,104 @@ public class DungeonGenerator : MonoBehaviour
         v.Normalize();
         v *= separatorForce;
         return v;
+    }
+
+    class WeightedEdge : IComparable<WeightedEdge> { 
+        public IPoint src, dest;
+        public float weight;
+
+        public WeightedEdge(IPoint src, IPoint dest) {
+            this.src = src;
+            this.dest = dest;
+            this.weight = Vector3.Distance(new Vector3((float) src.X, (float) src.Y), new Vector3((float) dest.X, (float) dest.Y));
+        }
+  
+        // Comparator function used for sorting edges based on weight
+        public int CompareTo(WeightedEdge otherEdge) {
+            if (this.weight <  otherEdge.weight) return -1;
+            if (this.weight == otherEdge.weight) return 0;
+            return 1;
+        } 
+    }
+
+    // Union
+    class Subset {
+        public int parent, rank;
+    };
+
+    private int FindInSubset(Subset[] subsets, int i) {
+        if (subsets[i].parent != i)
+        subsets[i].parent = FindInSubset(subsets, subsets[i].parent);
+        return subsets[i].parent;
+    }
+
+    void Union(Subset[] subsets, int x, int y) {
+        int xroot = FindInSubset(subsets, x);
+        int yroot = FindInSubset(subsets, y);
+
+        if (subsets[xroot].rank < subsets[yroot].rank) {
+            subsets[xroot].parent = yroot;
+        } else if (subsets[xroot].rank > subsets[yroot].rank) {
+            subsets[yroot].parent = xroot;
+        } else {
+            subsets[yroot].parent = xroot;
+            subsets[xroot].rank++;
+        }
+    }
+
+    int GetRoomIndex(IPoint point) {
+        for (int index = 0; index < rooms.Count; index++) {
+            Cell currentRoom = rooms.ElementAt(index);
+            if (currentRoom.transform.position.x == point.X && currentRoom.transform.position.y == point.Y) {
+                return index;
+            }
+        }
+        return int.MaxValue;
+    }
+
+    List<WeightedEdge> CalculateMST(Delaunator delaunator) {
+        List<WeightedEdge> allEdges = new List<WeightedEdge>();
+        WeightedEdge[] mst = new WeightedEdge[rooms.Count];
+        List<WeightedEdge> randomEdgesToInclude = new List<WeightedEdge>();
+        Subset[] subsets = new Subset[rooms.Count];
+        int mstIndex = 0;
+        int i = 0;
+
+        delaunator.ForEachTriangleEdge(edge => {
+            allEdges.Add(new WeightedEdge(edge.P, edge.Q));
+        });
+
+        // Sort edges based on weight
+        allEdges.Sort();
+
+        // Init subsets
+        for (int v = 0; v < rooms.Count; v++) {
+            subsets[v] = new Subset {
+                parent = v,
+                rank = 0
+            };
+        }
+
+        while (mstIndex < rooms.Count - 1) {
+            WeightedEdge nextWeightedEdge = allEdges.ElementAt(i++);
+            int x = FindInSubset(subsets, GetRoomIndex(nextWeightedEdge.src));
+            int y = FindInSubset(subsets, GetRoomIndex(nextWeightedEdge.dest));
+            if (x != y) {
+                mst[mstIndex++] = nextWeightedEdge;
+                Union(subsets, x, y);
+            }
+        }
+
+        foreach (WeightedEdge weightedEdge in allEdges) {
+            // Add some random edges to spice things up
+            int randomValue = UnityEngine.Random.Range(0, 100);
+            if (randomValue < 2 && !mst.Contains(weightedEdge)) {
+                randomEdgesToInclude.Add(weightedEdge);
+            }
+        }
+
+        randomEdgesToInclude.AddRange(mst);
+        return randomEdgesToInclude;
     }
 
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
@@ -7,15 +8,22 @@ public class Cell : MonoBehaviour {
     [Header("Aesthetics")]
     [SerializeField] GameObject wallPrefab;
     [SerializeField] float wallThickness = 0.025f;
-    [SerializeField] float doorPositionX = 1f;
-    [SerializeField] float doorPositionY = 1f;
+    // [SerializeField] float doorPositionX = 1f;
+    // [SerializeField] float doorPositionY = 1f;
     [SerializeField] float doorThickness = 0.5f;
     [SerializeField] float minRoomWidth = 0.0f;
     [SerializeField] float maxRoomWidth = 0.0f;
     [SerializeField] float minRoomHeight = 0.0f;
     [SerializeField] float maxRoomHeight = 0.0f;
 
-    [SerializeField] bool isRoomCandidate = false;
+    private List<Wall> walls = new List<Wall>();
+    private bool isRoomCandidate = false;
+
+    void Awake() {
+        // BuildWalls();
+        // AddDoor(new Vector3(0.7f, 0.4875f));
+        // AddDoor(new Vector3(1.3f, 0.4875f));
+    }
 
     public void SetDimensions(float width, float height) {
         transform.localScale += new Vector3(width, height, 0);
@@ -43,7 +51,7 @@ public class Cell : MonoBehaviour {
         return isOverlapping;
     }
 
-    void BuildWalls() {
+    public void BuildWalls() {
         float wallOffset = wallThickness / 2 / 100;
         Debug.Log("Wall Offset: " + wallOffset);
         Vector3 topWallPosition = transform.position + new Vector3(0, (transform.localScale.y / 2) - wallOffset);
@@ -69,7 +77,22 @@ public class Cell : MonoBehaviour {
         leftWall.SetDimensions(transform.localScale.y, wallThickness);
         rightWall.SetDimensions(transform.localScale.y, wallThickness);
 
-        topWall.SplitWall(new Vector3(doorPositionX, doorPositionY), doorThickness, this);
+        walls.Add(topWall);
+        walls.Add(bottomWall);
+        walls.Add(leftWall);
+        walls.Add(rightWall);
+    }
+
+    public void AddDoor(Vector3 position) {
+        Debug.Log("Vector X: " + position.x + ", Y: " + position.y);
+        for(int i = this.walls.Count - 1; i >= 0; i--) {
+            Debug.Log("Checking if vector is within wall...");
+            if (this.walls[i].IsWithinWall(position, this)) {
+                Debug.Log("Vector IS within wall!");
+                this.walls.AddRange(this.walls[i].SplitWall(position, doorThickness, this));
+                this.walls.RemoveAt(i);
+            }
+        }
     }
 
     public bool IsRoomCandidate() {
