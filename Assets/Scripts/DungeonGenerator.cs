@@ -28,10 +28,12 @@ public class DungeonGenerator : MonoBehaviour
     [Header("DungeonItems")]
     [SerializeField] GameObject dungeonBlockPrefab;
     [SerializeField] GameObject codexPrefab;
+    [SerializeField] List<GameObject> staticRooms;
 
     void Awake() {
         spawnRadius = numberOfCells / ((float) Math.PI) * 0.3f;
         lehmerRandom = GetComponent<LehmerRandom>();
+        dungeonBlocks.AddRange(staticRooms);
     }
 
     // Start is called before the first frame update

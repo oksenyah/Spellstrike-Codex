@@ -6,6 +6,10 @@ using Vector3 = UnityEngine.Vector3;
 
 public class Cell : MonoBehaviour {
 
+    [Header("Core")]
+    [SerializeField] bool isStatic = false;
+    [SerializeField] bool isRoomCandidate = false;
+
     [Header("Aesthetics")]
     [SerializeField] GameObject wallPrefab;
     [SerializeField] float wallThickness = 0.025f;
@@ -17,7 +21,7 @@ public class Cell : MonoBehaviour {
     [SerializeField] float maxRoomHeight = 0.0f;
 
     private List<Wall> walls = new List<Wall>();
-    private bool isRoomCandidate = false;
+    
 
     void Awake() {
         // BuildWalls();
@@ -39,6 +43,9 @@ public class Cell : MonoBehaviour {
     }
 
     public void ShiftPosition(Vector3 shift) {
+        if (isStatic) {
+            return;
+        }
         transform.position += shift;
     }
 
@@ -241,5 +248,9 @@ public class Cell : MonoBehaviour {
 
     public float GetWallThickness() {
         return wallThickness / 100;
+    }
+
+    public bool IsStatic() {
+        return isStatic;
     }
 }
