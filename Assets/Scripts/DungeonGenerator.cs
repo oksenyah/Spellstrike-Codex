@@ -24,6 +24,7 @@ public class DungeonGenerator : MonoBehaviour
     [SerializeField] float widthMin = 2;
     [SerializeField] float heightMax = 10;
     [SerializeField] float heightMin = 2;
+    [SerializeField] float playerThickness = 0.5f;
     [Header("DungeonItems")]
     [SerializeField] GameObject dungeonBlockPrefab;
     [SerializeField] GameObject codexPrefab;
@@ -118,7 +119,7 @@ public class DungeonGenerator : MonoBehaviour
 
             List<WeightedEdge> mstEdges = CalculateMST(delaunator);
             foreach (WeightedEdge weightedEdge in mstEdges) {
-                Debug.Log("Source: " + weightedEdge.src + ", Destination: " + weightedEdge.dest);
+                // Debug.Log("Source: " + weightedEdge.src + ", Destination: " + weightedEdge.dest);
 
                 // Generate Pathway Between Dungeon Cells
                 Cell sourceCell = GetRoomAtPoint(weightedEdge.src);
@@ -138,6 +139,7 @@ public class DungeonGenerator : MonoBehaviour
                     // Get Points Between XAxis Range and Connect Vertically
                     Vector3 sourceBorderVector = sourceCell.GetBorderConnectionVector3(destinationCell);
                     Vector3 destinationBorderVector = new Vector3(sourceBorderVector.x, destinationCell.GetBorderConnectionVector3(sourceCell).y);
+                    float borderDistance = Vector3.Distance(sourceBorderVector, destinationBorderVector);
                     Debug.DrawLine(sourceBorderVector, destinationBorderVector, Color.blue, float.PositiveInfinity);
 
                     // Add Vertical Pathway
@@ -151,53 +153,79 @@ public class DungeonGenerator : MonoBehaviour
                     float width = maxX - minX;
                     float length = maxY - minY;
 
+                    float pathThickness = playerThickness;
+                    Debug.Log("Comparing borderDistance " + borderDistance + " with desired thickness: " + pathThickness);
+                    if (borderDistance <= pathThickness) {
+                        // Tiny corridor, clear the entire thing out
+                        Debug.Log("borderDistance " + borderDistance + " is less than desired thickness. Expanding to width: " + width);
+                        pathThickness = width - (0.05f); // Account for walls
+                    } else {
+                        width = pathThickness + (0.05f); // Account for walls
+                    }
+
                     // Debug.Log("Pathway Dimensions, Width: " + width + ", Length: " + length + ", X: " + xMidPoint + ", Y: " + yMidPoint);
 
                     GameObject dungeonBlock = Instantiate(dungeonBlockPrefab, new Vector3(xMidPoint, yMidPoint, 0), Quaternion.identity);
-                    dungeonBlock.transform.localScale = Vector3.zero; // Zero out the scale since we already have ref
-                    dungeonBlock.GetComponent<Cell>().SetDimensions(width, length);
-                    dungeonBlock.GetComponent<Cell>().BuildWalls();
+                    Cell cell = dungeonBlock.GetComponent<Cell>();
+                    cell.transform.localScale = Vector3.zero; // Zero out the scale since we already have ref
+                    cell.SetDimensions(width, length);
+                    cell.BuildWalls();
 
-                    // TODO: Punch out doors
-                    sourceCell.AddDoor(sourceBorderVector);
-                    destinationCell.AddDoor(destinationBorderVector);
-                    dungeonBlock.GetComponent<Cell>().AddDoor(sourceBorderVector);
-                    dungeonBlock.GetComponent<Cell>().AddDoor(destinationBorderVector);
+                    // Punch out paths
+                    sourceCell.AddDoor(sourceBorderVector, pathThickness);
+                    destinationCell.AddDoor(destinationBorderVector, pathThickness);
+                    cell.AddDoor(sourceBorderVector, pathThickness);
+                    cell.AddDoor(destinationBorderVector, pathThickness);
 
-                    pathways.Add(dungeonBlock.GetComponent<Cell>());
+                    pathways.Add(cell);
                 } else if (sourceCell.IsOverlappingYAxisWith(destinationCell)) {
                     // Get Random Points Between YAxis Range and Connect Horizontally
                     Vector3 sourceBorderVector = sourceCell.GetBorderConnectionVector3(destinationCell);
                     Vector3 destinationBorderVector = new Vector3(destinationCell.GetBorderConnectionVector3(sourceCell).x, sourceBorderVector.y);
+                    float borderDistance = Vector3.Distance(sourceBorderVector, destinationBorderVector);
                     Debug.DrawLine(sourceBorderVector, destinationBorderVector, Color.blue, float.PositiveInfinity);
 
                     // Add Horizontal Pathway
                     float minX = Math.Max(sourceLeftBorder.x, destinationLeftBorder.x);
                     float maxX = Math.Min(sourceRightBorder.x, destinationRightBorder.x);
-                    float minY = Math.Min(sourceTopBorder.y, destinationTopBorder.y);
-                    float maxY = Math.Max(sourceBottomBorder.y, destinationBottomBorder.y);
+                    float minY = Math.Max(sourceBottomBorder.y, destinationBottomBorder.y);
+                    float maxY = Math.Min(sourceTopBorder.y, destinationTopBorder.y);
 
                     float xMidPoint = minX + ((maxX - minX) / 2);
                     float yMidPoint = minY + ((maxY - minY) / 2);
                     float width = maxX - minX;
                     float length = maxY - minY;
 
-                    Debug.Log("SOURCE Top: " + sourceTopBorder + ", Bottom: " + sourceBottomBorder + ", Left: " + sourceLeftBorder + ", Right: " + sourceRightBorder);
-                    Debug.Log("DESTIN Top: " + destinationTopBorder + ", Bottom: " + destinationBottomBorder + ", Left: " + destinationLeftBorder + ", Right: " + destinationRightBorder);
-                    Debug.Log("Pathway Dimensions, Width: " + width + ", Length: " + length + ", X: " + xMidPoint + ", Y: " + yMidPoint);
+                    float pathThickness = playerThickness;
+                    
+                    Debug.Log("Comparing borderDistance " + borderDistance + " with desired thickness: " + pathThickness);
+                    if (borderDistance <= pathThickness) {
+                        // Tiny corridor, clear the entire thing out
+                        Debug.Log("borderDistance " + borderDistance + " is less than desired thickness. Expanding to length: " + length);
+                        pathThickness = length - (0.05f); // Account for walls
+                    } else {
+                        length = pathThickness + (0.05f);
+                    }
+
+                    // Debug.Log("SOURCE Top: " + sourceTopBorder + ", Bottom: " + sourceBottomBorder + ", Left: " + sourceLeftBorder + ", Right: " + sourceRightBorder);
+                    // Debug.Log("DESTIN Top: " + destinationTopBorder + ", Bottom: " + destinationBottomBorder + ", Left: " + destinationLeftBorder + ", Right: " + destinationRightBorder);
+                    // Debug.Log("Pathway Dimensions, Width: " + width + ", Length: " + length + ", X: " + xMidPoint + ", Y: " + yMidPoint);
 
                     GameObject dungeonBlock = Instantiate(dungeonBlockPrefab, new Vector3(xMidPoint, yMidPoint, 0), Quaternion.identity);
-                    dungeonBlock.transform.localScale = Vector3.zero; // Zero out the scale since we already have ref
-                    dungeonBlock.GetComponent<Cell>().SetDimensions(width, length);
-                    dungeonBlock.GetComponent<Cell>().BuildWalls();
+                    Cell cell = dungeonBlock.GetComponent<Cell>();
+                    cell.transform.localScale = Vector3.zero; // Zero out the scale since we already have ref
+                    cell.SetDimensions(width, length);
+                    cell.BuildWalls();
 
-                    // TODO: Punch out doors
-                    sourceCell.AddDoor(sourceBorderVector);
-                    destinationCell.AddDoor(destinationBorderVector);
-                    dungeonBlock.GetComponent<Cell>().AddDoor(sourceBorderVector);
-                    dungeonBlock.GetComponent<Cell>().AddDoor(destinationBorderVector);
+                    // Punch out paths
+                    // Debug.Log("Punching out door on source cell at Vector: " + sourceBorderVector);
+                    sourceCell.AddDoor(sourceBorderVector, pathThickness);
+                    // Debug.Log("Punching out door on destination cell at Vector: " + destinationBorderVector);
+                    destinationCell.AddDoor(destinationBorderVector, pathThickness);
+                    cell.AddDoor(sourceBorderVector, pathThickness);
+                    cell.AddDoor(destinationBorderVector, pathThickness);
 
-                    pathways.Add(dungeonBlock.GetComponent<Cell>());
+                    pathways.Add(cell);
                 } else {
                     // L-Connector Across Closest Corners
                     Debug.DrawLine(weightedEdge.src.ToVector3(), weightedEdge.dest.ToVector3(), Color.blue, float.PositiveInfinity);
@@ -334,6 +362,7 @@ public class DungeonGenerator : MonoBehaviour
                 randomEdgesToInclude.Add(weightedEdge);
             }
         }
+
 
         randomEdgesToInclude.AddRange(mst);
         return randomEdgesToInclude;

@@ -11,7 +11,6 @@ public class Cell : MonoBehaviour {
     [SerializeField] float wallThickness = 0.025f;
     // [SerializeField] float doorPositionX = 1f;
     // [SerializeField] float doorPositionY = 1f;
-    [SerializeField] float doorThickness = 0.5f;
     [SerializeField] float minRoomWidth = 0.0f;
     [SerializeField] float maxRoomWidth = 0.0f;
     [SerializeField] float minRoomHeight = 0.0f;
@@ -21,10 +20,15 @@ public class Cell : MonoBehaviour {
     private bool isRoomCandidate = false;
 
     void Awake() {
-        BuildWalls();
+        // BuildWalls();
+        // Top Doors
         // AddDoor(new Vector3(1f, 0.5f));
-        AddDoor(new Vector3(0.7f, 0.5f));
-        AddDoor(new Vector3(1.3f, 0.5f));
+        // AddDoor(new Vector3(0.7f, 0.5f));
+        // AddDoor(new Vector3(1.3f, 0.5f));
+        // AddDoor(new Vector3(0f, 0.5f));
+        // Left Doors
+        // AddDoor(new Vector3(1f, 0.4f));
+        // AddDoor(new Vector3(1f, -0.4f));
     }
 
     public void SetDimensions(float width, float height) {
@@ -201,16 +205,26 @@ public class Cell : MonoBehaviour {
         walls.Add(rightWall);
     }
 
-    public void AddDoor(Vector3 position) {
-        Debug.Log("Vector X: " + position.x + ", Y: " + position.y);
-        for(int i = this.walls.Count - 1; i >= 0; i--) {
+    public void AddDoor(Vector3 position, float doorThickness) {
+        // Debug.Log("Adding Door at Vector X: " + position.x + ", Y: " + position.y);
+        List<Wall> wallsToAdd = new List<Wall>();
+        List<Wall> wallsToRemove = new List<Wall>();
+
+        foreach (Wall wall in walls) {
             Debug.Log("Checking if vector is within wall...");
-            if (this.walls[i].IsWithinWall(position, this)) {
-                Debug.Log("Vector IS within wall!");
-                this.walls.AddRange(this.walls[i].SplitWall(position, doorThickness, this));
-                this.walls.RemoveAt(i);
+            if (wall.IsWithinWall(position, this)) {
+                wallsToRemove.Add(wall);
+                Debug.Log("Vector IS within wall! Position: " + position + ", Wall: " + wall.transform.position);
+                wallsToAdd.AddRange(wall.SplitWall(position, doorThickness));
             }
         }
+
+        foreach (Wall wall in wallsToRemove) {
+            Debug.Log("Removing Wall: " + wall.transform.position);
+            walls.Remove(wall);
+        }
+
+        walls.AddRange(wallsToAdd);
     }
 
     public bool IsRoomCandidate() {
