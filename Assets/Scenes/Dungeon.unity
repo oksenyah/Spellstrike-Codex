@@ -653,11 +653,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefabs:
   - {fileID: 7439464352124356945, guid: c5411435bf3e0a742a8a2155c2242088, type: 3}
-  wizard: {fileID: 231355326}
   spawnTime: 1
   startEnemies: 1
-  spawnDistance: 5
-  minionDeathAudio: {fileID: 2007386972}
+  enemyDeathAudio: {fileID: 0}
   timer: 0
 --- !u!4 &378312146
 Transform:
@@ -5540,13 +5538,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   welcomeToTheDungeonAudio: {fileID: 784332909}
+  enemyDeathAudio: {fileID: 2007386972}
   numberOfCells: 15
   separatorForce: 0.15
   widthMax: 10
   widthMin: 2
-  heightMax: 10
+  heightMax: 8
   heightMin: 2
-  playerThickness: 0.5
+  playerThickness: 0.75
   dungeonBlockPrefab: {fileID: 1457407831092006400, guid: b89d712bd3dfa7648a85e669a45e5b38, type: 3}
   codexPrefab: {fileID: 6895414446476465628, guid: d09681b3e670bb141a6d7917d37c4e68, type: 3}
   staticRooms:
@@ -6044,6 +6043,10 @@ PrefabInstance:
     - target: {fileID: -5621085860462703637, guid: b89d712bd3dfa7648a85e669a45e5b38, type: 3}
       propertyPath: isStatic
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -5621085860462703637, guid: b89d712bd3dfa7648a85e669a45e5b38, type: 3}
+      propertyPath: canSpawnEnemies
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -5621085860462703637, guid: b89d712bd3dfa7648a85e669a45e5b38, type: 3}
       propertyPath: isRoomCandidate

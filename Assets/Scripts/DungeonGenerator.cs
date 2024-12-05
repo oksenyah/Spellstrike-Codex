@@ -17,6 +17,7 @@ public class DungeonGenerator : MonoBehaviour
 
     [Header("Audio")]
     [SerializeField] AudioSource welcomeToTheDungeonAudio;
+    [SerializeField] AudioSource enemyDeathAudio;
     [Header("Generator Settings")]
     [SerializeField] int numberOfCells = 1;
     [SerializeField] float separatorForce = 1.0f;
@@ -88,7 +89,7 @@ public class DungeonGenerator : MonoBehaviour
                         overlapDetected = true;
                         dungeonBlock.GetComponent<SpriteRenderer>().color = Color.red;
                     } else {
-                        dungeonBlock.GetComponent<SpriteRenderer>().color = Color.grey;
+                        dungeonBlock.GetComponent<SpriteRenderer>().color = Color.gray;
                     }
                     cell.ShiftPosition(separation);
                     // yield return new WaitForSeconds(0.01f);
@@ -104,7 +105,7 @@ public class DungeonGenerator : MonoBehaviour
             foreach (GameObject dungeonBlock in dungeonBlocks) {
                 Cell cell = dungeonBlock.GetComponent<Cell>();
                 if (cell.IsRoomCandidate()) {
-                    dungeonBlock.GetComponent<SpriteRenderer>().color = Color.green;
+                    dungeonBlock.GetComponent<SpriteRenderer>().color = Color.grey; // Saturation could be increased based on difficulty of room
                     cell.BuildWalls();
                     rooms.Add(cell);
                     points.Add(new Point(cell.transform.position.x, cell.transform.position.y));
@@ -115,122 +116,134 @@ public class DungeonGenerator : MonoBehaviour
             }
 
             Delaunator delaunator = new Delaunator(points.ToArray());
-            // delaunator.ForEachTriangleEdge(edge => {
-            //     Debug.DrawLine(edge.P.ToVector3(), edge.Q.ToVector3(), Color.blue, float.PositiveInfinity);
-            // });
 
             List<WeightedEdge> mstEdges = CalculateMST(delaunator);
             foreach (WeightedEdge weightedEdge in mstEdges) {
-                // Debug.Log("Source: " + weightedEdge.src + ", Destination: " + weightedEdge.dest);
+                if (weightedEdge != null) {
+                    Debug.Log("Weighted Edge: " + weightedEdge);
+                    Debug.Log("Source: " + weightedEdge.src + ", Destination: " + weightedEdge.dest);
 
-                // Generate Pathway Between Dungeon Cells
-                Cell sourceCell = GetRoomAtPoint(weightedEdge.src);
-                Cell destinationCell = GetRoomAtPoint(weightedEdge.dest);
+                    // Generate Pathway Between Dungeon Cells
+                    Cell sourceCell = GetRoomAtPoint(weightedEdge.src);
+                    Cell destinationCell = GetRoomAtPoint(weightedEdge.dest);
 
-                Vector3 sourceTopBorder = sourceCell.GetBorderVector3("top");
-                Vector3 sourceBottomBorder = sourceCell.GetBorderVector3("bottom");
-                Vector3 sourceLeftBorder = sourceCell.GetBorderVector3("left");
-                Vector3 sourceRightBorder = sourceCell.GetBorderVector3("right");
+                    Vector3 sourceTopBorder = sourceCell.GetBorderVector3("top");
+                    Vector3 sourceBottomBorder = sourceCell.GetBorderVector3("bottom");
+                    Vector3 sourceLeftBorder = sourceCell.GetBorderVector3("left");
+                    Vector3 sourceRightBorder = sourceCell.GetBorderVector3("right");
 
-                Vector3 destinationTopBorder = destinationCell.GetBorderVector3("top");
-                Vector3 destinationBottomBorder = destinationCell.GetBorderVector3("bottom");
-                Vector3 destinationLeftBorder = destinationCell.GetBorderVector3("left");
-                Vector3 destinationRightBorder = destinationCell.GetBorderVector3("right");
+                    Vector3 destinationTopBorder = destinationCell.GetBorderVector3("top");
+                    Vector3 destinationBottomBorder = destinationCell.GetBorderVector3("bottom");
+                    Vector3 destinationLeftBorder = destinationCell.GetBorderVector3("left");
+                    Vector3 destinationRightBorder = destinationCell.GetBorderVector3("right");
 
-                if (sourceCell.IsOverlappingXAxisWith(destinationCell)) {
-                    // Get Points Between XAxis Range and Connect Vertically
-                    Vector3 sourceBorderVector = sourceCell.GetBorderConnectionVector3(destinationCell);
-                    Vector3 destinationBorderVector = new Vector3(sourceBorderVector.x, destinationCell.GetBorderConnectionVector3(sourceCell).y);
-                    float borderDistance = Vector3.Distance(sourceBorderVector, destinationBorderVector);
-                    Debug.DrawLine(sourceBorderVector, destinationBorderVector, Color.blue, float.PositiveInfinity);
+                    if (sourceCell.IsOverlappingXAxisWith(destinationCell)) {
+                        // Get Points Between XAxis Range and Connect Vertically
+                        Vector3 sourceBorderVector = sourceCell.GetBorderConnectionVector3(destinationCell);
+                        Vector3 destinationBorderVector = new Vector3(sourceBorderVector.x, destinationCell.GetBorderConnectionVector3(sourceCell).y);
+                        float borderDistance = Vector3.Distance(sourceBorderVector, destinationBorderVector);
+                        Debug.DrawLine(sourceBorderVector, destinationBorderVector, Color.blue, float.PositiveInfinity);
 
-                    // Add Vertical Pathway
-                    float minX = Math.Max(sourceLeftBorder.x, destinationLeftBorder.x);
-                    float maxX = Math.Min(sourceRightBorder.x, destinationRightBorder.x);
-                    float minY = Math.Min(sourceTopBorder.y, destinationTopBorder.y);
-                    float maxY = Math.Max(sourceBottomBorder.y, destinationBottomBorder.y);
+                        // Add Vertical Pathway
+                        float minX = Math.Max(sourceLeftBorder.x, destinationLeftBorder.x);
+                        float maxX = Math.Min(sourceRightBorder.x, destinationRightBorder.x);
+                        float minY = Math.Min(sourceTopBorder.y, destinationTopBorder.y);
+                        float maxY = Math.Max(sourceBottomBorder.y, destinationBottomBorder.y);
 
-                    float xMidPoint = minX + ((maxX - minX) / 2);
-                    float yMidPoint = minY + ((maxY - minY) / 2);
-                    float width = maxX - minX;
-                    float length = maxY - minY;
+                        float xMidPoint = minX + ((maxX - minX) / 2);
+                        float yMidPoint = minY + ((maxY - minY) / 2);
+                        float width = maxX - minX;
+                        float length = maxY - minY;
 
-                    float pathThickness = playerThickness;
-                    Debug.Log("Comparing borderDistance " + borderDistance + " with desired thickness: " + pathThickness);
-                    if (borderDistance <= pathThickness) {
-                        // Tiny corridor, clear the entire thing out
-                        Debug.Log("borderDistance " + borderDistance + " is less than desired thickness. Expanding to width: " + width);
-                        pathThickness = width - (0.05f); // Account for walls
+                        float pathThickness = playerThickness;
+                        Debug.Log("Comparing borderDistance " + borderDistance + " with desired thickness: " + pathThickness);
+                        if (borderDistance <= pathThickness) {
+                            // Tiny corridor, clear the entire thing out
+                            Debug.Log("borderDistance " + borderDistance + " is less than desired thickness. Expanding to width: " + width);
+                            pathThickness = width - (0.05f); // Account for walls
+                        } else {
+                            width = pathThickness + (0.05f); // Account for walls
+                        }
+
+                        // Debug.Log("Pathway Dimensions, Width: " + width + ", Length: " + length + ", X: " + xMidPoint + ", Y: " + yMidPoint);
+
+                        GameObject dungeonBlock = Instantiate(dungeonBlockPrefab, new Vector3(xMidPoint, yMidPoint, 0), Quaternion.identity);
+                        dungeonBlock.GetComponent<SpriteRenderer>().color = Color.grey;
+                        Cell cell = dungeonBlock.GetComponent<Cell>();
+                        cell.transform.localScale = Vector3.zero; // Zero out the scale since we already have ref
+                        cell.SetDimensions(width, length);
+                        cell.BuildWalls();
+
+                        // Punch out paths
+                        sourceCell.AddDoor(sourceBorderVector, pathThickness);
+                        destinationCell.AddDoor(destinationBorderVector, pathThickness);
+                        cell.AddDoor(sourceBorderVector, pathThickness);
+                        cell.AddDoor(destinationBorderVector, pathThickness);
+
+                        pathways.Add(cell);
+                    } else if (sourceCell.IsOverlappingYAxisWith(destinationCell)) {
+                        // Get Random Points Between YAxis Range and Connect Horizontally
+                        Vector3 sourceBorderVector = sourceCell.GetBorderConnectionVector3(destinationCell);
+                        Vector3 destinationBorderVector = new Vector3(destinationCell.GetBorderConnectionVector3(sourceCell).x, sourceBorderVector.y);
+                        float borderDistance = Vector3.Distance(sourceBorderVector, destinationBorderVector);
+                        Debug.DrawLine(sourceBorderVector, destinationBorderVector, Color.blue, float.PositiveInfinity);
+
+                        // Add Horizontal Pathway
+                        float minX = Math.Max(sourceLeftBorder.x, destinationLeftBorder.x);
+                        float maxX = Math.Min(sourceRightBorder.x, destinationRightBorder.x);
+                        float minY = Math.Max(sourceBottomBorder.y, destinationBottomBorder.y);
+                        float maxY = Math.Min(sourceTopBorder.y, destinationTopBorder.y);
+
+                        float xMidPoint = minX + ((maxX - minX) / 2);
+                        float yMidPoint = minY + ((maxY - minY) / 2);
+                        float width = maxX - minX;
+                        float length = maxY - minY;
+
+                        float pathThickness = playerThickness;
+                        
+                        Debug.Log("Comparing borderDistance " + borderDistance + " with desired thickness: " + pathThickness);
+                        if (borderDistance <= pathThickness) {
+                            // Tiny corridor, clear the entire thing out
+                            Debug.Log("borderDistance " + borderDistance + " is less than desired thickness. Expanding to length: " + length);
+                            pathThickness = length - (0.05f); // Account for walls
+                        } else {
+                            length = pathThickness + (0.05f);
+                        }
+
+                        // Debug.Log("SOURCE Top: " + sourceTopBorder + ", Bottom: " + sourceBottomBorder + ", Left: " + sourceLeftBorder + ", Right: " + sourceRightBorder);
+                        // Debug.Log("DESTIN Top: " + destinationTopBorder + ", Bottom: " + destinationBottomBorder + ", Left: " + destinationLeftBorder + ", Right: " + destinationRightBorder);
+                        // Debug.Log("Pathway Dimensions, Width: " + width + ", Length: " + length + ", X: " + xMidPoint + ", Y: " + yMidPoint);
+
+                        GameObject dungeonBlock = Instantiate(dungeonBlockPrefab, new Vector3(xMidPoint, yMidPoint, 0), Quaternion.identity);
+                        dungeonBlock.GetComponent<SpriteRenderer>().color = Color.grey;
+                        Cell cell = dungeonBlock.GetComponent<Cell>();
+                        cell.transform.localScale = Vector3.zero; // Zero out the scale since we already have ref
+                        cell.SetDimensions(width, length);
+                        cell.BuildWalls();
+
+                        // Punch out paths
+                        // Debug.Log("Punching out door on source cell at Vector: " + sourceBorderVector);
+                        sourceCell.AddDoor(sourceBorderVector, pathThickness);
+                        // Debug.Log("Punching out door on destination cell at Vector: " + destinationBorderVector);
+                        destinationCell.AddDoor(destinationBorderVector, pathThickness);
+                        cell.AddDoor(sourceBorderVector, pathThickness);
+                        cell.AddDoor(destinationBorderVector, pathThickness);
+
+                        pathways.Add(cell);
                     } else {
-                        width = pathThickness + (0.05f); // Account for walls
+                        // L-Connector Across Closest Corners
+                        Debug.DrawLine(weightedEdge.src.ToVector3(), weightedEdge.dest.ToVector3(), Color.blue, float.PositiveInfinity);
                     }
+                }
+            }
 
-                    // Debug.Log("Pathway Dimensions, Width: " + width + ", Length: " + length + ", X: " + xMidPoint + ", Y: " + yMidPoint);
-
-                    GameObject dungeonBlock = Instantiate(dungeonBlockPrefab, new Vector3(xMidPoint, yMidPoint, 0), Quaternion.identity);
-                    Cell cell = dungeonBlock.GetComponent<Cell>();
-                    cell.transform.localScale = Vector3.zero; // Zero out the scale since we already have ref
-                    cell.SetDimensions(width, length);
-                    cell.BuildWalls();
-
-                    // Punch out paths
-                    sourceCell.AddDoor(sourceBorderVector, pathThickness);
-                    destinationCell.AddDoor(destinationBorderVector, pathThickness);
-                    cell.AddDoor(sourceBorderVector, pathThickness);
-                    cell.AddDoor(destinationBorderVector, pathThickness);
-
-                    pathways.Add(cell);
-                } else if (sourceCell.IsOverlappingYAxisWith(destinationCell)) {
-                    // Get Random Points Between YAxis Range and Connect Horizontally
-                    Vector3 sourceBorderVector = sourceCell.GetBorderConnectionVector3(destinationCell);
-                    Vector3 destinationBorderVector = new Vector3(destinationCell.GetBorderConnectionVector3(sourceCell).x, sourceBorderVector.y);
-                    float borderDistance = Vector3.Distance(sourceBorderVector, destinationBorderVector);
-                    Debug.DrawLine(sourceBorderVector, destinationBorderVector, Color.blue, float.PositiveInfinity);
-
-                    // Add Horizontal Pathway
-                    float minX = Math.Max(sourceLeftBorder.x, destinationLeftBorder.x);
-                    float maxX = Math.Min(sourceRightBorder.x, destinationRightBorder.x);
-                    float minY = Math.Max(sourceBottomBorder.y, destinationBottomBorder.y);
-                    float maxY = Math.Min(sourceTopBorder.y, destinationTopBorder.y);
-
-                    float xMidPoint = minX + ((maxX - minX) / 2);
-                    float yMidPoint = minY + ((maxY - minY) / 2);
-                    float width = maxX - minX;
-                    float length = maxY - minY;
-
-                    float pathThickness = playerThickness;
-                    
-                    Debug.Log("Comparing borderDistance " + borderDistance + " with desired thickness: " + pathThickness);
-                    if (borderDistance <= pathThickness) {
-                        // Tiny corridor, clear the entire thing out
-                        Debug.Log("borderDistance " + borderDistance + " is less than desired thickness. Expanding to length: " + length);
-                        pathThickness = length - (0.05f); // Account for walls
-                    } else {
-                        length = pathThickness + (0.05f);
-                    }
-
-                    // Debug.Log("SOURCE Top: " + sourceTopBorder + ", Bottom: " + sourceBottomBorder + ", Left: " + sourceLeftBorder + ", Right: " + sourceRightBorder);
-                    // Debug.Log("DESTIN Top: " + destinationTopBorder + ", Bottom: " + destinationBottomBorder + ", Left: " + destinationLeftBorder + ", Right: " + destinationRightBorder);
-                    // Debug.Log("Pathway Dimensions, Width: " + width + ", Length: " + length + ", X: " + xMidPoint + ", Y: " + yMidPoint);
-
-                    GameObject dungeonBlock = Instantiate(dungeonBlockPrefab, new Vector3(xMidPoint, yMidPoint, 0), Quaternion.identity);
-                    Cell cell = dungeonBlock.GetComponent<Cell>();
-                    cell.transform.localScale = Vector3.zero; // Zero out the scale since we already have ref
-                    cell.SetDimensions(width, length);
-                    cell.BuildWalls();
-
-                    // Punch out paths
-                    // Debug.Log("Punching out door on source cell at Vector: " + sourceBorderVector);
-                    sourceCell.AddDoor(sourceBorderVector, pathThickness);
-                    // Debug.Log("Punching out door on destination cell at Vector: " + destinationBorderVector);
-                    destinationCell.AddDoor(destinationBorderVector, pathThickness);
-                    cell.AddDoor(sourceBorderVector, pathThickness);
-                    cell.AddDoor(destinationBorderVector, pathThickness);
-
-                    pathways.Add(cell);
-                } else {
-                    // L-Connector Across Closest Corners
-                    Debug.DrawLine(weightedEdge.src.ToVector3(), weightedEdge.dest.ToVector3(), Color.blue, float.PositiveInfinity);
+            foreach (Cell room in rooms) {
+                if (room.CanSpawnEnemies()) {
+                    Debug.Log("Starting to spawn enemies in room: " + room.transform.position);
+                    EnemySpawner enemySpawner = room.GetComponent<EnemySpawner>();
+                    enemySpawner.SetEnemyDeathAudio(enemyDeathAudio);
+                    enemySpawner.SpawnStartingEnemies();
+                    enemySpawner.SpawnEnemies();
                 }
             }
 

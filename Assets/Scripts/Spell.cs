@@ -21,6 +21,8 @@ public class Spell : MonoBehaviour
             other.GetComponent<Enemy>().TakeDamage(this.damage);
             hitAudio.Play();
             // Destroy(this.gameObject);
+        } else if(other.CompareTag("Wall")){
+            Destroy(this.gameObject);
         }
     }
 }

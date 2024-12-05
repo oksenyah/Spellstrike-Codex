@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5731731609598233130}
   - component: {fileID: 3683227608087303955}
   - component: {fileID: -5621085860462703637}
+  - component: {fileID: 6707739803861150997}
   m_Layer: 0
   m_Name: Cell
   m_TagString: Untagged
@@ -97,13 +98,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6933d174b9e7be345a3dbd27be0043c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isStatic: 0
+  isRoomCandidate: 0
   wallPrefab: {fileID: 4319050250460914967, guid: 118fe5acdb6c7084b80a947e059c203d, type: 3}
   wallThickness: 2.5
-  doorPositionX: 1
-  doorPositionY: 1
-  doorThickness: 0.5
-  minRoomWidth: 4
-  maxRoomWidth: 10
-  minRoomHeight: 4
-  maxRoomHeight: 10
-  isRoomCandidate: 0
+  minRoomWidth: 2
+  maxRoomWidth: 8
+  minRoomHeight: 2
+  maxRoomHeight: 8
+--- !u!114 &6707739803861150997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457407831092006400}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb2dea5490e098148ae573986a8b7975, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyPrefabs:
+  - {fileID: 7439464352124356945, guid: c5411435bf3e0a742a8a2155c2242088, type: 3}
+  spawnTime: 5
+  startEnemies: 3
+  enemyDeathAudio: {fileID: 0}
+  timer: 0
