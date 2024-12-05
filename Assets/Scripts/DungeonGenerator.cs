@@ -13,6 +13,7 @@ public class DungeonGenerator : MonoBehaviour
     private float spawnRadius;
     private List<GameObject> dungeonBlocks = new List<GameObject>();
     private List<Cell> rooms = new List<Cell>();
+    private List<Cell> pathways = new List<Cell>();
 
     [Header("Audio")]
     [SerializeField] AudioSource welcomeToTheDungeonAudio;
@@ -118,9 +119,89 @@ public class DungeonGenerator : MonoBehaviour
             List<WeightedEdge> mstEdges = CalculateMST(delaunator);
             foreach (WeightedEdge weightedEdge in mstEdges) {
                 Debug.Log("Source: " + weightedEdge.src + ", Destination: " + weightedEdge.dest);
-                Debug.DrawLine(weightedEdge.src.ToVector3(), weightedEdge.dest.ToVector3(), Color.blue, float.PositiveInfinity);
 
-                
+                // Generate Pathway Between Dungeon Cells
+                Cell sourceCell = GetRoomAtPoint(weightedEdge.src);
+                Cell destinationCell = GetRoomAtPoint(weightedEdge.dest);
+
+                Vector3 sourceTopBorder = sourceCell.GetBorderVector3("top");
+                Vector3 sourceBottomBorder = sourceCell.GetBorderVector3("bottom");
+                Vector3 sourceLeftBorder = sourceCell.GetBorderVector3("left");
+                Vector3 sourceRightBorder = sourceCell.GetBorderVector3("right");
+
+                Vector3 destinationTopBorder = destinationCell.GetBorderVector3("top");
+                Vector3 destinationBottomBorder = destinationCell.GetBorderVector3("bottom");
+                Vector3 destinationLeftBorder = destinationCell.GetBorderVector3("left");
+                Vector3 destinationRightBorder = destinationCell.GetBorderVector3("right");
+
+                if (sourceCell.IsOverlappingXAxisWith(destinationCell)) {
+                    // Get Points Between XAxis Range and Connect Vertically
+                    Vector3 sourceBorderVector = sourceCell.GetBorderConnectionVector3(destinationCell);
+                    Vector3 destinationBorderVector = new Vector3(sourceBorderVector.x, destinationCell.GetBorderConnectionVector3(sourceCell).y);
+                    Debug.DrawLine(sourceBorderVector, destinationBorderVector, Color.blue, float.PositiveInfinity);
+
+                    // Add Vertical Pathway
+                    float minX = Math.Max(sourceLeftBorder.x, destinationLeftBorder.x);
+                    float maxX = Math.Min(sourceRightBorder.x, destinationRightBorder.x);
+                    float minY = Math.Min(sourceTopBorder.y, destinationTopBorder.y);
+                    float maxY = Math.Max(sourceBottomBorder.y, destinationBottomBorder.y);
+
+                    float xMidPoint = minX + ((maxX - minX) / 2);
+                    float yMidPoint = minY + ((maxY - minY) / 2);
+                    float width = maxX - minX;
+                    float length = maxY - minY;
+
+                    // Debug.Log("Pathway Dimensions, Width: " + width + ", Length: " + length + ", X: " + xMidPoint + ", Y: " + yMidPoint);
+
+                    GameObject dungeonBlock = Instantiate(dungeonBlockPrefab, new Vector3(xMidPoint, yMidPoint, 0), Quaternion.identity);
+                    dungeonBlock.transform.localScale = Vector3.zero; // Zero out the scale since we already have ref
+                    dungeonBlock.GetComponent<Cell>().SetDimensions(width, length);
+                    dungeonBlock.GetComponent<Cell>().BuildWalls();
+
+                    // TODO: Punch out doors
+                    sourceCell.AddDoor(sourceBorderVector);
+                    destinationCell.AddDoor(destinationBorderVector);
+                    dungeonBlock.GetComponent<Cell>().AddDoor(sourceBorderVector);
+                    dungeonBlock.GetComponent<Cell>().AddDoor(destinationBorderVector);
+
+                    pathways.Add(dungeonBlock.GetComponent<Cell>());
+                } else if (sourceCell.IsOverlappingYAxisWith(destinationCell)) {
+                    // Get Random Points Between YAxis Range and Connect Horizontally
+                    Vector3 sourceBorderVector = sourceCell.GetBorderConnectionVector3(destinationCell);
+                    Vector3 destinationBorderVector = new Vector3(destinationCell.GetBorderConnectionVector3(sourceCell).x, sourceBorderVector.y);
+                    Debug.DrawLine(sourceBorderVector, destinationBorderVector, Color.blue, float.PositiveInfinity);
+
+                    // Add Horizontal Pathway
+                    float minX = Math.Max(sourceLeftBorder.x, destinationLeftBorder.x);
+                    float maxX = Math.Min(sourceRightBorder.x, destinationRightBorder.x);
+                    float minY = Math.Min(sourceTopBorder.y, destinationTopBorder.y);
+                    float maxY = Math.Max(sourceBottomBorder.y, destinationBottomBorder.y);
+
+                    float xMidPoint = minX + ((maxX - minX) / 2);
+                    float yMidPoint = minY + ((maxY - minY) / 2);
+                    float width = maxX - minX;
+                    float length = maxY - minY;
+
+                    Debug.Log("SOURCE Top: " + sourceTopBorder + ", Bottom: " + sourceBottomBorder + ", Left: " + sourceLeftBorder + ", Right: " + sourceRightBorder);
+                    Debug.Log("DESTIN Top: " + destinationTopBorder + ", Bottom: " + destinationBottomBorder + ", Left: " + destinationLeftBorder + ", Right: " + destinationRightBorder);
+                    Debug.Log("Pathway Dimensions, Width: " + width + ", Length: " + length + ", X: " + xMidPoint + ", Y: " + yMidPoint);
+
+                    GameObject dungeonBlock = Instantiate(dungeonBlockPrefab, new Vector3(xMidPoint, yMidPoint, 0), Quaternion.identity);
+                    dungeonBlock.transform.localScale = Vector3.zero; // Zero out the scale since we already have ref
+                    dungeonBlock.GetComponent<Cell>().SetDimensions(width, length);
+                    dungeonBlock.GetComponent<Cell>().BuildWalls();
+
+                    // TODO: Punch out doors
+                    sourceCell.AddDoor(sourceBorderVector);
+                    destinationCell.AddDoor(destinationBorderVector);
+                    dungeonBlock.GetComponent<Cell>().AddDoor(sourceBorderVector);
+                    dungeonBlock.GetComponent<Cell>().AddDoor(destinationBorderVector);
+
+                    pathways.Add(dungeonBlock.GetComponent<Cell>());
+                } else {
+                    // L-Connector Across Closest Corners
+                    Debug.DrawLine(weightedEdge.src.ToVector3(), weightedEdge.dest.ToVector3(), Color.blue, float.PositiveInfinity);
+                }
             }
 
             yield return null;
@@ -201,6 +282,16 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
         return int.MaxValue;
+    }
+
+    Cell GetRoomAtPoint(IPoint point) {
+        for (int index = 0; index < rooms.Count; index++) {
+            Cell currentRoom = rooms.ElementAt(index);
+            if (currentRoom.transform.position.x == point.X && currentRoom.transform.position.y == point.Y) {
+                return currentRoom;
+            }
+        }
+        return null;
     }
 
     List<WeightedEdge> CalculateMST(Delaunator delaunator) {
