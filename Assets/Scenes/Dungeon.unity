@@ -622,56 +622,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f595c5e20ef332840b604b64008b198d, type: 3}
---- !u!1 &378312144
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 378312146}
-  - component: {fileID: 378312145}
-  m_Layer: 0
-  m_Name: EnemySpawner
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &378312145
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 378312144}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb2dea5490e098148ae573986a8b7975, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enemyPrefabs:
-  - {fileID: 7439464352124356945, guid: c5411435bf3e0a742a8a2155c2242088, type: 3}
-  spawnTime: 1
-  startEnemies: 1
-  enemyDeathAudio: {fileID: 0}
-  timer: 0
---- !u!4 &378312146
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 378312144}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &446408731
 GameObject:
   m_ObjectHideFlags: 0
@@ -5545,6 +5495,11 @@ MonoBehaviour:
   heightMax: 8
   heightMin: 2
   playerThickness: 0.75
+  roomSpawnsEnemiesPercentage: 0.35
+  minStartingEnemiesPerRoom: 1
+  maxStartingEnemiesPerRoom: 20
+  minEnemySpawnIntervalInSeconds: 1
+  maxEnemySpawnIntervalInSeconds: 60
   dungeonBlockPrefab: {fileID: 1457407831092006400, guid: b89d712bd3dfa7648a85e669a45e5b38, type: 3}
   codexPrefab: {fileID: 6895414446476465628, guid: d09681b3e670bb141a6d7917d37c4e68, type: 3}
   staticRooms:
@@ -6811,7 +6766,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -5621085860462703637, guid: b89d712bd3dfa7648a85e669a45e5b38, type: 3}
       propertyPath: isStatic
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -5621085860462703637, guid: b89d712bd3dfa7648a85e669a45e5b38, type: 3}
       propertyPath: canSpawnEnemies
@@ -6819,6 +6774,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -5621085860462703637, guid: b89d712bd3dfa7648a85e669a45e5b38, type: 3}
       propertyPath: isRoomCandidate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -5621085860462703637, guid: b89d712bd3dfa7648a85e669a45e5b38, type: 3}
+      propertyPath: mustSpawnEnemies
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1457407831092006400, guid: b89d712bd3dfa7648a85e669a45e5b38, type: 3}
@@ -6882,9 +6841,21 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6707739803861150997, guid: b89d712bd3dfa7648a85e669a45e5b38, type: 3}
+      propertyPath: spawnTime
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6707739803861150997, guid: b89d712bd3dfa7648a85e669a45e5b38, type: 3}
+      propertyPath: startEnemies
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6707739803861150997, guid: b89d712bd3dfa7648a85e669a45e5b38, type: 3}
       propertyPath: enemyDeathAudio
       value: 
       objectReference: {fileID: 2007386972}
+    - target: {fileID: 6707739803861150997, guid: b89d712bd3dfa7648a85e669a45e5b38, type: 3}
+      propertyPath: isConfigOverrideable
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7753,7 +7724,6 @@ SceneRoots:
   - {fileID: 599199389}
   - {fileID: 263255190}
   - {fileID: 266659952}
-  - {fileID: 378312146}
   - {fileID: 727202975}
   - {fileID: 541725402}
   - {fileID: 296799568}

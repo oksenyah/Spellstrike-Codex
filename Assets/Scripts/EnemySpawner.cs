@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-
     [SerializeField] List<GameObject> enemyPrefabs;
 
     [SerializeField] float spawnTime = 5f;
-    [SerializeField] float startEnemies = 3;
+    [SerializeField] int startEnemies = 3;
     [Header("Audio")]
     [SerializeField] AudioSource enemyDeathAudio;
+    [Header("Config")]
+    [SerializeField] bool isConfigOverrideable = true;
 
     public float timer = 0;
     private Cell dungeonCell;
@@ -36,16 +37,30 @@ public class EnemySpawner : MonoBehaviour
     }
 
     public void SpawnEnemies() {
-        StartCoroutine(SpawnEnemiesRoutine());
-        IEnumerator SpawnEnemiesRoutine() {
-            while (true) {
-                yield return new WaitForSeconds(spawnTime);
-                SpawnEnemyInDungeon();
+        if (spawnTime != 0) {
+            StartCoroutine(SpawnEnemiesRoutine());
+            IEnumerator SpawnEnemiesRoutine() {
+                while (true) {
+                    yield return new WaitForSeconds(spawnTime);
+                    SpawnEnemyInDungeon();
+                }
             }
         }
     }
 
     public void SetEnemyDeathAudio(AudioSource enemyDeathAudio) {
         this.enemyDeathAudio = enemyDeathAudio;
+    }
+
+    public void SetStartingEnemiesCount(int startingEnemiesCount) {
+        if (isConfigOverrideable) {
+            this.startEnemies = startingEnemiesCount;
+        }
+    }
+
+    public void SetSpawnIntervalInSeconds(float spawnIntervalInSeconds) {
+        if (isConfigOverrideable) {
+            this.spawnTime = spawnIntervalInSeconds;
+        }
     }
 }

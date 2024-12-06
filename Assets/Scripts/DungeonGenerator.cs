@@ -25,7 +25,12 @@ public class DungeonGenerator : MonoBehaviour
     [SerializeField] float widthMin = 2;
     [SerializeField] float heightMax = 10;
     [SerializeField] float heightMin = 2;
-    [SerializeField] float playerThickness = 0.5f;
+    [SerializeField] float playerThickness = 0.75f;
+    [SerializeField] float roomSpawnsEnemiesPercentage = 0.35f;
+    [SerializeField] int minStartingEnemiesPerRoom = 1;
+    [SerializeField] int maxStartingEnemiesPerRoom = 20;
+    [SerializeField] float minEnemySpawnIntervalInSeconds = 1;
+    [SerializeField] float maxEnemySpawnIntervalInSeconds = 60f;
     [Header("DungeonItems")]
     [SerializeField] GameObject dungeonBlockPrefab;
     [SerializeField] GameObject codexPrefab;
@@ -51,7 +56,7 @@ public class DungeonGenerator : MonoBehaviour
             float randomX = UnityEngine.Random.Range(-spawnRadius, spawnRadius);
             float randomY = UnityEngine.Random.Range(-spawnRadius, spawnRadius);
             GameObject dungeonBlock = Instantiate(dungeonBlockPrefab,new Vector3(randomX, randomY, 0),Quaternion.identity);
-            dungeonBlock.GetComponent<Cell>().SetDimensions((float) lehmerRandom.GetNextDouble(0, widthMax), (float) lehmerRandom.GetNextDouble(0, heightMax));
+            dungeonBlock.GetComponent<Cell>().SetDimensions((float) lehmerRandom.GetNextDouble(widthMin, widthMax), (float) lehmerRandom.GetNextDouble(heightMin, heightMax));
             dungeonBlocks.Add(dungeonBlock);
         }
 
@@ -239,11 +244,16 @@ public class DungeonGenerator : MonoBehaviour
 
             foreach (Cell room in rooms) {
                 if (room.CanSpawnEnemies()) {
-                    // Debug.Log("Starting to spawn enemies in room: " + room.transform.position);
-                    EnemySpawner enemySpawner = room.GetComponent<EnemySpawner>();
-                    enemySpawner.SetEnemyDeathAudio(enemyDeathAudio);
-                    enemySpawner.SpawnStartingEnemies();
-                    enemySpawner.SpawnEnemies();
+
+                    if (UnityEngine.Random.Range(0.0f, 1f) <= roomSpawnsEnemiesPercentage || room.MustSpawnEnemies()) {
+                        // Debug.Log("Starting to spawn enemies in room: " + room.transform.position);
+                        EnemySpawner enemySpawner = room.GetComponent<EnemySpawner>();
+                        enemySpawner.SetEnemyDeathAudio(enemyDeathAudio);
+                        enemySpawner.SetStartingEnemiesCount(UnityEngine.Random.Range(minStartingEnemiesPerRoom, maxStartingEnemiesPerRoom));
+                        enemySpawner.SetSpawnIntervalInSeconds(UnityEngine.Random.Range(minEnemySpawnIntervalInSeconds, maxEnemySpawnIntervalInSeconds));
+                        enemySpawner.SpawnStartingEnemies();
+                        enemySpawner.SpawnEnemies();
+                    }
                 }
             }
 

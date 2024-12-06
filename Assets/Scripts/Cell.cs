@@ -8,7 +8,9 @@ public class Cell : MonoBehaviour {
 
     [Header("Core")]
     [SerializeField] bool isStatic = false;
+    [SerializeField] bool isRoomCandidate = false;
     [SerializeField] bool canSpawnEnemies = true;
+    [SerializeField] bool mustSpawnEnemies = false;
 
     [Header("Aesthetics")]
     [SerializeField] GameObject wallPrefab;
@@ -20,14 +22,10 @@ public class Cell : MonoBehaviour {
     [SerializeField] float minRoomHeight = 0.0f;
     [SerializeField] float maxRoomHeight = 0.0f;
 
-    private bool isRoomCandidate = false;
     private List<Wall> walls = new List<Wall>();
     
 
     void Awake() {
-        if (isStatic) {
-            isRoomCandidate = true;
-        }
         // BuildWalls();
         // Top Doors
         // AddDoor(new Vector3(1f, 0.5f));
@@ -260,5 +258,9 @@ public class Cell : MonoBehaviour {
 
     public bool CanSpawnEnemies() {
         return canSpawnEnemies;
+    }
+
+    public bool MustSpawnEnemies() {
+        return mustSpawnEnemies;
     }
 }
