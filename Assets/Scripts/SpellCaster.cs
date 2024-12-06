@@ -43,7 +43,7 @@ public class SpellCaster : MonoBehaviour
 
         for(int i = 0; i<projectileCount; i++){
             GameObject newSpell = Instantiate(spellPrefab, wizard.transform.position, goalRotation);
-            newSpell.GetComponent<Spell>().ConjureSpell(spellDamage);
+            newSpell.GetComponent<Spell>().ConjureSpell(wizard, spellDamage);
             newSpell.transform.localScale = Vector3.one * projectileSize;
 
             newSpell.GetComponent<Rigidbody2D>().velocity = newSpell.transform.up * projectileSpeed;

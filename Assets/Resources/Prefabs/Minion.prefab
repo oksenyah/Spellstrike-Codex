@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 7439464352124356945}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.1, y: 0.99, z: -3.4025023}
+  m_LocalPosition: {x: 1.1, y: 0.99, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -104,10 +104,10 @@ MonoBehaviour:
   speed: 0.5
   damage: 1
   attackIntervalInSeconds: 1
+  sightDistance: 3
   lootPrefabs:
   - {fileID: 7365106534577778081, guid: 70bcd9f6c3532d24191e7bfba4fb13ce, type: 3}
   lootDropRate: 0.05
-  deathAudio: {fileID: 0}
 --- !u!114 &5353391059307046559
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -120,9 +120,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57766bc18c8274e4792bdf2bc8f056bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentStateString: InitialState
   targetTransform: {fileID: 0}
-  sightDistance: 10
+  numberOfRays: 45
+  numberOfDegrees: 360
 --- !u!50 &6818265197738428151
 Rigidbody2D:
   serializedVersion: 4

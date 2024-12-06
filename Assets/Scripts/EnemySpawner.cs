@@ -20,22 +20,11 @@ public class EnemySpawner : MonoBehaviour
         this.dungeonCell = GetComponent<Cell>();
     }
 
-    // void SpawnEnemy() {
-    //     Vector3 spawnPos = wizard.transform.position + new Vector3(Random.Range(-1f,1f),Random.Range(-1f,1f),0).normalized * spawnDistance;
-    //     while (Vector2.Distance(spawnPos, wizard.transform.position) < spawnDistance) {
-    //         spawnPos = wizard.transform.position + new Vector3(Random.Range(-1f,1f),Random.Range(-1f,1f),0).normalized * spawnDistance;
-    //     }
-    //     GameObject enemyObject = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Count)], spawnPos, Quaternion.identity);
-    //     enemyObject.GetComponent<Enemy>().SetDeathAudio(minionDeathAudio);
-    //     EnemyAI enemyAI = enemyObject.GetComponent<EnemyAI>();
-    //     enemyAI.SetTarget(wizard.transform);
-    // }
-
     void SpawnEnemyInDungeon() {
         float halfWidth = dungeonCell.GetWidth() / 2;
         float halfLength = dungeonCell.GetLength() / 2;
         Vector3 spawnPos = new Vector3(dungeonCell.transform.position.x + Random.Range(-halfWidth, halfWidth), dungeonCell.transform.position.y + Random.Range(-halfLength, halfLength), 0);
-        Debug.Log("Spawning Enemy in Dungeon! Spawn Position: " + spawnPos + ", Cell Position: " + dungeonCell.transform.position);
+        // Debug.Log("Spawning Enemy in Dungeon! Spawn Position: " + spawnPos + ", Cell Position: " + dungeonCell.transform.position);
         GameObject enemyObject = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Count)], spawnPos, Quaternion.identity);
         enemyObject.GetComponent<Enemy>().SetDeathAudio(enemyDeathAudio);
     }

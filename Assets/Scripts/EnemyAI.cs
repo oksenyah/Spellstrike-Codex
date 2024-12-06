@@ -10,20 +10,20 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] Transform targetTransform;
 
     [Header("Config")]
-    [SerializeField] float sightDistance = 5;
     [SerializeField] int numberOfRays = 45;
     [SerializeField] int numberOfDegrees = 360;
     private Vector3 spawnPosition;
     private Vector3 startingVector;
-    private LayerMask wizardLayerMask;
+    private LayerMask charactersLayerMask;
     private RaycastHit2D[] results;
+    private bool isStalking;
 
     delegate void AIState();
     AIState currentState;
 
     void Awake() {
         character = GetComponent<Enemy>();
-	    wizardLayerMask = LayerMask.GetMask("Wizard");
+	    charactersLayerMask = LayerMask.GetMask("Characters", "Walls");
         results = new RaycastHit2D[numberOfRays];
         startingVector = Quaternion.Euler(0, 0, Random.Range(0, 360)) * transform.up;
         spawnPosition = transform.position;
@@ -35,7 +35,13 @@ public class EnemyAI : MonoBehaviour
         ChangeState(WanderState);
     }
 
-    public void SetTarget(Transform targetTransform) {
+    public void StartStalkingTarget(Transform targetTransform, bool isStalking) {
+        this.isStalking = isStalking;
+        this.targetTransform = targetTransform;
+        this.ChangeState(StalkingState);
+    }
+
+    void SetTarget(Transform targetTransform) {
         this.targetTransform = targetTransform;
     }
 
@@ -49,7 +55,7 @@ public class EnemyAI : MonoBehaviour
         } else {
             float distanceToTarget = Vector3.Distance(character.transform.position, targetTransform.position);
             // Debug.Log("Distance to target: " + distanceToTarget);
-            return distanceToTarget <= sightDistance;
+            return distanceToTarget <= character.GetSightDistance();
         }
     }
 
@@ -68,12 +74,22 @@ public class EnemyAI : MonoBehaviour
             ChangeState(WanderState);
             return;
         }
-        
+    }
+
+    void StalkingState() {
+        if (targetTransform != null) {
+            // Debug.Log("stalking...");
+            character.MoveToward(targetTransform.position);
+        } else {
+            Debug.Log("Target is null. Wandering...");
+            ChangeState(WanderState);
+            return;
+        }
     }
 
     void WanderState() {
-        if (Vector3.Distance(character.transform.position, spawnPosition) < sightDistance) {
-                character.MoveToward(character.transform.position + new Vector3(Random.Range(-sightDistance,sightDistance),Random.Range(-sightDistance,sightDistance),0));
+        if (Vector3.Distance(character.transform.position, spawnPosition) < character.GetSightDistance()) {
+                character.MoveToward(character.transform.position + new Vector3(Random.Range(-character.GetSightDistance(),character.GetSightDistance()),Random.Range(-character.GetSightDistance(),character.GetSightDistance()),0));
         } else {
             character.MoveToward(spawnPosition); // Go towards home if we wander too far.
         }
@@ -102,27 +118,21 @@ public class EnemyAI : MonoBehaviour
         if (targetTransform == null) {
             // Look for a new target
             for (int i = 0; i < numberOfRays; i++) {
-                // Debug.Log("Ray: " + i + ", Delta Angle: " + deltaAngle + ", Distance: " + sightDistance);
-                // var raycastDirection = Quaternion.Euler(0, 0, i * deltaAngle) * transform.up * sightDistance;
-                var raycastDirection = Quaternion.Euler(0, 0, i * deltaAngle) * startingVector * sightDistance;
+                // Debug.Log("Ray: " + i + ", Delta Angle: " + deltaAngle + ", Distance: " + character.GetSightDistance());
+                // var raycastDirection = Quaternion.Euler(0, 0, i * deltaAngle) * transform.up * character.GetSightDistance();
+                var raycastDirection = Quaternion.Euler(0, 0, i * deltaAngle) * startingVector * character.GetSightDistance();
                 // Debug.Log("Raycast direction: " + raycastDirection);
                 Debug.DrawRay(transform.position, raycastDirection, Color.gray);
-                int hitCount = Physics2D.LinecastNonAlloc(transform.position, raycastDirection, results, wizardLayerMask);
+                int hitCount = Physics2D.LinecastNonAlloc(transform.position, raycastDirection, results, charactersLayerMask);
                 if (hitCount > 0) {
                     foreach (RaycastHit2D hit in results) {
-                        // Debug.Log("Collision detected!");
                         // Hit was detected!
                         if (hit) {
-                            if (Vector3.Distance(character.transform.position, hit.collider.transform.position) <= sightDistance) {
-                                if (hit.collider.CompareTag("Loot")) {
-                                    // Check if loot is unclaimed
-                                    Debug.Log("Loot found!");
-                                    targetTransform = hit.collider.transform;
-                                    targetFound = true;
-                                    Debug.DrawLine(character.transform.position, hit.transform.position, Color.blue);
-                                    break;
-                                } else if (hit.collider.CompareTag("Wizard")) {
-                                    // Debug.Log("Enemy nearby!!!");
+                            // Debug.Log("Found Tag: " + hit.collider.tag);
+                            // Debug.Log("Distance Between Enemy and Wizard: " + Vector3.Distance(character.transform.position, hit.collider.transform.position));
+                            if (Vector3.Distance(character.transform.position, hit.collider.transform.position) <= character.GetSightDistance()) {
+                                if (hit.collider.CompareTag("Wizard")) {
+                                    Debug.Log("Enemy nearby!!!");
                                     targetTransform = hit.collider.transform;
                                     targetFound = true;
                                     Debug.DrawLine(character.transform.position, hit.transform.position, Color.green);
@@ -142,7 +152,12 @@ public class EnemyAI : MonoBehaviour
         }
         
         if (!targetFound) {
-            targetTransform = null;
+            if (!isStalking) {
+                Debug.Log("Null transform since we are NOT stalking.");
+                targetTransform = null;
+            } else {
+                Debug.Log("Not Updating Transform since we are stalking...");
+            }
         }
     }
 

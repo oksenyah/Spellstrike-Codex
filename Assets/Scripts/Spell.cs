@@ -9,16 +9,19 @@ public class Spell : MonoBehaviour
     [SerializeField] AudioSource castAudio;
     [SerializeField] AudioSource hitAudio;
 
+
+    Wizard sourcerer;
     int damage;
 
-    public void ConjureSpell(int damage) {
+    public void ConjureSpell(Wizard wizard, int damage) {
+        this.sourcerer = wizard;
         this.damage = damage;
         castAudio.Play();
     }
 
     void OnTriggerEnter2D(Collider2D other){
         if(other.CompareTag("Enemy")){
-            other.GetComponent<Enemy>().TakeDamage(this.damage);
+            other.GetComponent<Enemy>().TakeDamage(this.damage, this.sourcerer);
             hitAudio.Play();
             // Destroy(this.gameObject);
         } else if(other.CompareTag("Wall")){
