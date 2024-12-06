@@ -151,11 +151,159 @@ public class Cell : MonoBehaviour {
         } else {
             // TODO: L-Shaped Connection
             Debug.Log("L-Shaped Connection Detected...");
+            Vector3 cornerVector = Vector3.zero;
+            Vector3 otherCornerVector = Vector3.zero;
+            bool isTopBorderConnection = true;
+            bool isBottomBorderConnection = true;
+            bool isLeftBorderConnection = true;
+            bool isRightBorderConnection = true;
+            float halfPathOffset = (0.7f / 2) + 0.025f;
+
+            if (topBorder.y <= otherBottomBorder.y) {
+                isBottomBorderConnection = false;
+            }
+            if (bottomBorder.y >= otherTopBorder.y) {
+                isTopBorderConnection = false;
+            }
+            if (leftBorder.x >= otherRightBorder.x) {
+                isRightBorderConnection = false;
+            }
+            if (rightBorder.x <= otherLeftBorder.x) {
+                isLeftBorderConnection = false;
+            }
+
+            if (isTopBorderConnection && isRightBorderConnection) {
+                // Top Right Corner
+                cornerVector = new Vector3(rightBorder.x, topBorder.y);
+                otherCornerVector = new Vector3(otherLeftBorder.x, otherBottomBorder.y);
+                Debug.Log("Top Right Corner: " + cornerVector);
+                float cornerPositionFromLine = DistanceFromLine(transform.position, other.transform.position, cornerVector);
+                float otherCornerPositionFromLine = DistanceFromLine(transform.position, other.transform.position, otherCornerVector);
+                float direction = cornerPositionFromLine;
+                
+                if (Mathf.Abs(cornerPositionFromLine) < Mathf.Abs(otherCornerPositionFromLine)) {
+                    // Compare magnitudes and go with the stronger one
+                    direction = otherCornerPositionFromLine;
+                }
+
+                if (direction < 0) {
+                    // Border on right
+                    x = cornerVector.x;
+                    y = cornerVector.y - halfPathOffset;
+                } else if (direction > 0) {
+                    // Border on top
+                    x = cornerVector.x - halfPathOffset;
+                    y = cornerVector.y;
+                } else {
+                    // Corner Case
+                    // Both are exactly in the corner. Coordinate with "Top Right" it needs to go to the right
+                    x = cornerVector.x;
+                    y = cornerVector.y - halfPathOffset;
+                }
+                
+            } else if (isTopBorderConnection && isLeftBorderConnection) {
+                // Top Left Corner
+                cornerVector = new Vector3(leftBorder.x, topBorder.y);
+                otherCornerVector = new Vector3(otherRightBorder.x, otherBottomBorder.y);
+                Debug.Log("Top Left Corner: " + cornerVector);
+                float cornerPositionFromLine = DistanceFromLine(transform.position, other.transform.position, cornerVector);
+                float otherCornerPositionFromLine = DistanceFromLine(transform.position, other.transform.position, otherCornerVector);
+                float direction = cornerPositionFromLine;
+                
+                if (Mathf.Abs(cornerPositionFromLine) < Mathf.Abs(otherCornerPositionFromLine)) {
+                    // Compare magnitudes and go with the stronger one
+                    direction = otherCornerPositionFromLine;
+                    Debug.Log("Switching to other corner's direction");
+                }
+
+                Debug.Log("Direction: " + direction + ", Corner Distance From Line: " + cornerPositionFromLine + ", Other Corner Distance From Line: " + otherCornerPositionFromLine);
+
+                if (direction > 0) {
+                    // Border on top
+                    x = cornerVector.x + halfPathOffset;
+                    y = cornerVector.y;
+                } else if (direction < 0) {
+                    // Border on left
+                    x = cornerVector.x;
+                    y = cornerVector.y - halfPathOffset;
+                } else {
+                    // Corner Case
+                    // Both are exactly in the corner. Coordinate with "Bottom Right" it needs to go to the bottom
+                    x = cornerVector.x;
+                    y = cornerVector.y - halfPathOffset;
+                }
+            } else if (isBottomBorderConnection && isLeftBorderConnection) {
+                // Bottom Left Corner
+                cornerVector = new Vector3(leftBorder.x, bottomBorder.y);
+                otherCornerVector = new Vector3(otherRightBorder.x, otherTopBorder.y);
+                Debug.Log("Bottom Left Corner: " + cornerVector);
+                float cornerPositionFromLine = DistanceFromLine(transform.position, other.transform.position, cornerVector);
+                float otherCornerPositionFromLine = DistanceFromLine(transform.position, other.transform.position, otherCornerVector);
+                float direction = cornerPositionFromLine;
+                
+                if (Mathf.Abs(cornerPositionFromLine) < Mathf.Abs(otherCornerPositionFromLine)) {
+                    // Compare magnitudes and go with the stronger one
+                    direction = otherCornerPositionFromLine;
+                }
+                if (direction > 0) {
+                    // Border on bottom
+                    x = cornerVector.x + halfPathOffset;
+                    y = cornerVector.y;
+                } else if (direction < 0) {
+                    // Border on left
+                    x = cornerVector.x;
+                    y = cornerVector.y + halfPathOffset;
+                } else {
+                    // Corner Case
+                    // Both are exactly in the corner. Coordinate with "Top Right" it needs to go to the right
+                    x = cornerVector.x;
+                    y = cornerVector.y + halfPathOffset;
+                }
+            } else if (isBottomBorderConnection && isRightBorderConnection) {
+                // Bottom Right Corner
+                cornerVector = new Vector3(rightBorder.x, bottomBorder.y);
+                otherCornerVector = new Vector3(otherLeftBorder.x, otherTopBorder.y);
+                Debug.Log("Bottom Right Corner: " + cornerVector);
+		        float cornerPositionFromLine = DistanceFromLine(transform.position, other.transform.position, cornerVector);
+                float otherCornerPositionFromLine = DistanceFromLine(transform.position, other.transform.position, otherCornerVector);
+                float direction = cornerPositionFromLine;
+                
+                if (Mathf.Abs(cornerPositionFromLine) < Mathf.Abs(otherCornerPositionFromLine)) {
+                    // Compare magnitudes and go with the stronger one
+                    direction = otherCornerPositionFromLine;
+                }
+                if (direction < 0) {
+                    // Border on right
+                    x = cornerVector.x;
+                    y = cornerVector.y + halfPathOffset;
+                } else if (direction > 0) {
+                    // Border on bottom
+                    x = cornerVector.x - halfPathOffset;
+                    y = cornerVector.y;
+                } else {
+                    // Corner Case
+                    // Both are exactly in the corner. Coordinate with "Top Left" it needs to go to the bottom
+                    x = cornerVector.x - halfPathOffset;
+                    y = cornerVector.y;
+                }
+
+            } else {
+                Debug.Log("Unknown State!");
+            }
         }
 
         borderVector = new Vector3(x, y);
+        Debug.Log("Border Vector: " + borderVector);
 
         return borderVector;
+    }
+
+    private bool IsLeftOfLine(Vector3 sourceOfLine, Vector3 destinationOfLine, Vector3 pointToCheck) {
+        return (destinationOfLine.x - sourceOfLine.x) * (pointToCheck.y - sourceOfLine.y) > (destinationOfLine.y - sourceOfLine.y) * (pointToCheck.x - sourceOfLine.x);
+    }
+
+    private float DistanceFromLine(Vector3 sourceOfLine, Vector3 destinationOfLine, Vector3 pointToCheck) {
+        return Mathf.Abs((destinationOfLine.y - sourceOfLine.y) * (pointToCheck.x - sourceOfLine.x)) - Mathf.Abs((destinationOfLine.x - sourceOfLine.x) * (pointToCheck.y - sourceOfLine.y));
     }
 
     public Vector3 GetBorderVector3(string direction) {

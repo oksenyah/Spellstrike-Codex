@@ -583,7 +583,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8311162969800197258, guid: f595c5e20ef332840b604b64008b198d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -11
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8311162969800197258, guid: f595c5e20ef332840b604b64008b198d, type: 3}
       propertyPath: m_LocalPosition.z
@@ -5488,7 +5488,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   welcomeToTheDungeonAudio: {fileID: 784332909}
   enemyDeathAudio: {fileID: 2007386972}
-  numberOfCells: 25
+  numberOfCells: 150
   separatorForce: 0.15
   widthMax: 10
   widthMin: 2
@@ -5505,6 +5505,7 @@ MonoBehaviour:
   staticRooms:
   - {fileID: 1961717698}
   - {fileID: 580818986}
+  - {fileID: 0}
 --- !u!4 &541725402
 Transform:
   m_ObjectHideFlags: 0
@@ -6104,7 +6105,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5731731609598233130, guid: b89d712bd3dfa7648a85e669a45e5b38, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -10
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5731731609598233130, guid: b89d712bd3dfa7648a85e669a45e5b38, type: 3}
       propertyPath: m_LocalPosition.z

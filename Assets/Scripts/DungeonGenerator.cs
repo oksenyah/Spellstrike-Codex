@@ -238,6 +238,177 @@ public class DungeonGenerator : MonoBehaviour
                     } else {
                         // L-Connector Across Closest Corners
                         Debug.DrawLine(weightedEdge.src.ToVector3(), weightedEdge.dest.ToVector3(), Color.blue, float.PositiveInfinity);
+
+                        Vector3 sourceBorderVector = sourceCell.GetBorderConnectionVector3(destinationCell);
+                        Vector3 destinationBorderVector = destinationCell.GetBorderConnectionVector3(sourceCell);
+                        Vector3 cornerVector = Vector3.zero;
+                        float sourceMidpointX = 0f;
+                        float sourceMidpointY = 0f;
+                        float destinationMidpointX = 0f;
+                        float destinationMidpointY = 0f;
+                        float connectorDoorX = 0f;
+                        float connectorDoorY = 0f;
+                        float pathThickness = playerThickness;
+                        float sourceWidth = pathThickness;
+                        float sourceLength = pathThickness;
+                        float destinationWidth = pathThickness;
+                        float destinationLength = pathThickness;
+                        float wallWidthOffset = (0.025f * 2);
+                        float quarterPathOffset = pathThickness * 0.25f;
+                        float halfPathOffset = pathThickness / 2f;
+
+                        bool rightToLeft = sourceRightBorder.x < destinationLeftBorder.x;
+                        bool bottomToTop = sourceBottomBorder.y > destinationTopBorder.y;
+
+                        if (rightToLeft && bottomToTop) {
+                            if (sourceBorderVector.x == sourceRightBorder.x) {
+                                // source on right, dest on top
+                                Debug.Log("source on right, dest on top");
+                                cornerVector = new Vector3(destinationBorderVector.x, sourceBorderVector.y);
+                                sourceWidth = cornerVector.x - sourceBorderVector.x + (pathThickness / 2);
+                                destinationLength = cornerVector.y - destinationBorderVector.y - (pathThickness / 2);
+
+                                sourceMidpointX = ((sourceBorderVector.x + cornerVector.x) / 2) + quarterPathOffset;
+                                sourceMidpointY = sourceBorderVector.y;
+                                destinationMidpointX = destinationBorderVector.x;
+                                destinationMidpointY = ((cornerVector.y + destinationBorderVector.y) / 2) - quarterPathOffset;
+                                connectorDoorX = destinationBorderVector.x;
+                                connectorDoorY = sourceBorderVector.y - halfPathOffset;
+                            } else {
+                                // source on bottom, dest on right
+                                Debug.Log("source on bottom, dest on right");
+                                cornerVector = new Vector3(sourceBorderVector.x, destinationBorderVector.y);
+                                sourceLength = sourceBorderVector.y - cornerVector.y + (pathThickness / 2);
+                                destinationWidth = destinationBorderVector.x - cornerVector.x - (pathThickness / 2);
+
+                                sourceMidpointX = sourceBorderVector.x;
+                                sourceMidpointY = ((sourceBorderVector.y + cornerVector.y) / 2) - quarterPathOffset;
+                                destinationMidpointX = ((cornerVector.x + destinationBorderVector.x) / 2) + quarterPathOffset;
+                                destinationMidpointY = destinationBorderVector.y;
+                                connectorDoorX = sourceBorderVector.x + halfPathOffset;
+                                connectorDoorY = destinationBorderVector.y;
+                            }
+                        } else if (rightToLeft && !bottomToTop) {
+                            if (sourceBorderVector.x == sourceRightBorder.x) {
+                                // source on right, dest on bottom
+                                Debug.Log("source on right, dest on bottom");
+                                cornerVector = new Vector3(destinationBorderVector.x, sourceBorderVector.y);
+                                sourceWidth = cornerVector.x - sourceBorderVector.x + (pathThickness / 2);
+                                destinationLength = destinationBorderVector.y - cornerVector.y - (pathThickness / 2);
+
+                                sourceMidpointX = ((sourceBorderVector.x + cornerVector.x) / 2) + quarterPathOffset;
+                                sourceMidpointY = sourceBorderVector.y;
+                                destinationMidpointX = destinationBorderVector.x;
+                                destinationMidpointY = ((cornerVector.y + destinationBorderVector.y) / 2) + quarterPathOffset;
+                                connectorDoorX = destinationBorderVector.x;
+                                connectorDoorY = sourceBorderVector.y + halfPathOffset;
+                            } else {
+                                // source on top, dest on left
+                                Debug.Log("source on top, dest on left");
+                                cornerVector = new Vector3(sourceBorderVector.x, destinationBorderVector.y);
+                                sourceLength = cornerVector.y - sourceBorderVector.y + (pathThickness / 2);
+                                destinationWidth = destinationBorderVector.x - cornerVector.x - (pathThickness / 2);
+
+                                sourceMidpointX = sourceBorderVector.x;
+                                sourceMidpointY = ((sourceBorderVector.y + cornerVector.y) / 2) + quarterPathOffset;
+                                destinationMidpointX = ((cornerVector.x + destinationBorderVector.x) / 2) + quarterPathOffset;
+                                destinationMidpointY = destinationBorderVector.y;
+                                connectorDoorX = sourceBorderVector.x + halfPathOffset;
+                                connectorDoorY = destinationBorderVector.y;
+                            }
+                        } else if (!rightToLeft && !bottomToTop) {
+                            if (sourceBorderVector.x == sourceLeftBorder.x) {
+                                // source on left, dest on bottom
+                                Debug.Log("source on left, dest on bottom");
+                                cornerVector = new Vector3(destinationBorderVector.x, sourceBorderVector.y);
+                                sourceWidth = sourceBorderVector.x - cornerVector.x + (pathThickness / 2);
+                                destinationLength = destinationBorderVector.y - cornerVector.y - (pathThickness / 2);
+
+                                sourceMidpointX = ((sourceBorderVector.x + cornerVector.x) / 2) - quarterPathOffset;
+                                sourceMidpointY = sourceBorderVector.y;
+                                destinationMidpointX = destinationBorderVector.x;
+                                destinationMidpointY = ((cornerVector.y + destinationBorderVector.y) / 2) + quarterPathOffset;
+                                connectorDoorX = destinationBorderVector.x;
+                                connectorDoorY = sourceBorderVector.y + halfPathOffset;
+                            } else {
+                                // source on top, dest on right
+                                Debug.Log("source on top, dest on right");
+                                cornerVector = new Vector3(sourceBorderVector.x, destinationBorderVector.y);
+                                sourceLength = cornerVector.y - sourceBorderVector.y + halfPathOffset;
+                                destinationWidth = cornerVector.x - destinationBorderVector.x - halfPathOffset;
+
+                                sourceMidpointX = sourceBorderVector.x;
+                                sourceMidpointY = ((sourceBorderVector.y + cornerVector.y) / 2) + quarterPathOffset;
+                                destinationMidpointX = ((cornerVector.x + destinationBorderVector.x) / 2) - quarterPathOffset;
+                                destinationMidpointY = destinationBorderVector.y;
+                                connectorDoorX = sourceBorderVector.x - halfPathOffset;
+                                connectorDoorY = destinationBorderVector.y;
+                            }
+                        } else if (!rightToLeft && bottomToTop) {
+                            if (sourceBorderVector.x == sourceLeftBorder.x) {
+                                // source on left, dest on top
+                                Debug.Log("source on left, dest on top");
+                                cornerVector = new Vector3(destinationBorderVector.x, sourceBorderVector.y);
+                                sourceWidth = sourceBorderVector.x - cornerVector.x + halfPathOffset;
+                                destinationLength = cornerVector.y - destinationBorderVector.y - halfPathOffset;
+
+                                sourceMidpointX = ((sourceBorderVector.x + cornerVector.x) / 2) - quarterPathOffset;
+                                sourceMidpointY = sourceBorderVector.y;
+                                destinationMidpointX = destinationBorderVector.x;
+                                destinationMidpointY = ((cornerVector.y + destinationBorderVector.y) / 2) - quarterPathOffset;
+                                connectorDoorX = destinationBorderVector.x;
+                                connectorDoorY = sourceBorderVector.y - halfPathOffset;
+                            } else {
+                                // source on bottom, dest on right
+                                Debug.Log("source on bottom, dest on right");
+                                cornerVector = new Vector3(sourceBorderVector.x, destinationBorderVector.y);
+                                sourceLength = sourceBorderVector.y - cornerVector.y + halfPathOffset;
+                                destinationWidth = cornerVector.x - destinationBorderVector.x - halfPathOffset;
+
+                                sourceMidpointX = sourceBorderVector.x;
+                                sourceMidpointY = ((sourceBorderVector.y + cornerVector.y) / 2) - quarterPathOffset;
+                                destinationMidpointX = ((cornerVector.x + destinationBorderVector.x) / 2) - quarterPathOffset;
+                                destinationMidpointY = destinationBorderVector.y;
+                                connectorDoorX = sourceBorderVector.x - halfPathOffset;
+                                connectorDoorY = destinationBorderVector.y;
+                            }
+                        } else {
+                            Debug.Log("Unknown State");
+                        }
+
+                        Debug.Log("Corner Vector: " + cornerVector);
+
+                        Debug.DrawLine(sourceBorderVector, cornerVector, Color.blue, float.PositiveInfinity);
+                        Debug.DrawLine(destinationBorderVector, cornerVector, Color.blue, float.PositiveInfinity);
+
+                        // Build Pathway to corner vector
+                        Vector3 sourceMidpoint = new Vector3(sourceMidpointX, sourceMidpointY);
+                        Vector3 destinationMidpoint = new Vector3(destinationMidpointX, destinationMidpointY);
+
+                        GameObject sourceDungeonBlock = Instantiate(dungeonBlockPrefab, sourceMidpoint, Quaternion.identity);
+                        sourceDungeonBlock.GetComponent<SpriteRenderer>().color = Color.grey;
+                        Cell sourcePathwayCell = sourceDungeonBlock.GetComponent<Cell>();
+                        sourcePathwayCell.transform.localScale = Vector3.zero; // Zero out the scale since we already have ref
+                        sourcePathwayCell.SetDimensions(sourceWidth, sourceLength);
+                        sourcePathwayCell.BuildWalls();
+
+                        GameObject destinationDungeonBlock = Instantiate(dungeonBlockPrefab, destinationMidpoint, Quaternion.identity);
+                        destinationDungeonBlock.GetComponent<SpriteRenderer>().color = Color.grey;
+                        Cell destinationPathwayCell = destinationDungeonBlock.GetComponent<Cell>();
+                        destinationPathwayCell.transform.localScale = Vector3.zero; // Zero out the scale since we already have ref
+                        destinationPathwayCell.SetDimensions(destinationWidth, destinationLength);
+                        destinationPathwayCell.BuildWalls();
+
+                        sourceCell.AddDoor(sourceBorderVector, pathThickness - wallWidthOffset);
+                        sourcePathwayCell.AddDoor(sourceBorderVector, pathThickness - wallWidthOffset);
+                        sourcePathwayCell.AddDoor(new Vector3(connectorDoorX, connectorDoorY), pathThickness - wallWidthOffset);
+
+                        destinationCell.AddDoor(destinationBorderVector, pathThickness - wallWidthOffset);
+                        destinationPathwayCell.AddDoor(destinationBorderVector, pathThickness - wallWidthOffset);
+                        destinationPathwayCell.AddDoor(new Vector3(connectorDoorX, connectorDoorY), pathThickness - wallWidthOffset);
+
+                        pathways.Add(sourcePathwayCell);
+                        pathways.Add(destinationPathwayCell);
                     }
                 }
             }
