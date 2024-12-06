@@ -18,8 +18,15 @@ public class EnemyAI : MonoBehaviour
     private RaycastHit2D[] results;
     private bool isStalking;
 
+    // AI
     delegate void AIState();
     AIState currentState;
+
+    // State
+    private float stateTime = 0;
+    private bool justChangedState;
+    private Vector3 wanderPosition;
+    private Vector3 wanderPivot;
 
     void Awake() {
         character = GetComponent<Enemy>();
@@ -47,6 +54,7 @@ public class EnemyAI : MonoBehaviour
 
     void ChangeState(AIState newAIState){
         currentState = newAIState;
+        justChangedState = true;
     }
 
      bool CanSeeTarget() {
@@ -70,7 +78,7 @@ public class EnemyAI : MonoBehaviour
         if (targetTransform != null) {
             character.MoveToward(targetTransform.position);
         } else {
-            Debug.Log("Target is null. Wandering...");
+            // Debug.Log("Target is null. Wandering...");
             ChangeState(WanderState);
             return;
         }
@@ -81,28 +89,39 @@ public class EnemyAI : MonoBehaviour
             // Debug.Log("stalking...");
             character.MoveToward(targetTransform.position);
         } else {
-            Debug.Log("Target is null. Wandering...");
+            // Debug.Log("Target is null. Wandering...");
             ChangeState(WanderState);
             return;
         }
     }
 
     void WanderState() {
-        if (Vector3.Distance(character.transform.position, spawnPosition) < character.GetSightDistance()) {
-                character.MoveToward(character.transform.position + new Vector3(Random.Range(-character.GetSightDistance(),character.GetSightDistance()),Random.Range(-character.GetSightDistance(),character.GetSightDistance()),0));
-        } else {
-            character.MoveToward(spawnPosition); // Go towards home if we wander too far.
+        if(stateTime == 0){
+            SetTarget(null);
+            wanderPivot = character.transform.position;
+            wanderPosition = character.transform.position + new Vector3(Random.Range(-character.GetSightDistance(), character.GetSightDistance()),Random.Range(-character.GetSightDistance(), character.GetSightDistance()));
         }
 
+        character.MoveToward(wanderPosition);
+
         if (CanSeeTarget()) {
-            // Debug.Log("Can see target, attacking!");
             ChangeState(AttackState);
+            return;
+        }
+
+        if (Vector3.Distance(character.transform.position, wanderPosition) < 1f){
+            wanderPosition = wanderPivot + new Vector3(Random.Range(-character.GetSightDistance(), character.GetSightDistance()), Random.Range(-character.GetSightDistance(), character.GetSightDistance()));
             return;
         }
     }
 
     void AITick() {
+        if(justChangedState){
+            stateTime = 0;
+            justChangedState = false;
+        }
         currentState();
+        stateTime += Time.deltaTime;
     }
 
     // Update is called once per frame
@@ -132,7 +151,7 @@ public class EnemyAI : MonoBehaviour
                             // Debug.Log("Distance Between Enemy and Wizard: " + Vector3.Distance(character.transform.position, hit.collider.transform.position));
                             if (Vector3.Distance(character.transform.position, hit.collider.transform.position) <= character.GetSightDistance()) {
                                 if (hit.collider.CompareTag("Wizard")) {
-                                    Debug.Log("Enemy nearby!!!");
+                                    // Debug.Log("Enemy nearby!!!");
                                     targetTransform = hit.collider.transform;
                                     targetFound = true;
                                     Debug.DrawLine(character.transform.position, hit.transform.position, Color.green);
@@ -153,10 +172,10 @@ public class EnemyAI : MonoBehaviour
         
         if (!targetFound) {
             if (!isStalking) {
-                Debug.Log("Null transform since we are NOT stalking.");
+                // Debug.Log("Null transform since we are NOT stalking.");
                 targetTransform = null;
             } else {
-                Debug.Log("Not Updating Transform since we are stalking...");
+                // Debug.Log("Not Updating Transform since we are stalking...");
             }
         }
     }

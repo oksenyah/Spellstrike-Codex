@@ -96,7 +96,7 @@ public class DungeonGenerator : MonoBehaviour
                 }
 
                 if (overlapDetected) {
-                    Debug.Log("Overlaps detected. Sleeping...");
+                    // Debug.Log("Overlaps detected. Sleeping...");
                     yield return new WaitForSeconds(0.0001f);
                 }
             }
@@ -120,8 +120,8 @@ public class DungeonGenerator : MonoBehaviour
             List<WeightedEdge> mstEdges = CalculateMST(delaunator);
             foreach (WeightedEdge weightedEdge in mstEdges) {
                 if (weightedEdge != null) {
-                    Debug.Log("Weighted Edge: " + weightedEdge);
-                    Debug.Log("Source: " + weightedEdge.src + ", Destination: " + weightedEdge.dest);
+                    // Debug.Log("Weighted Edge: " + weightedEdge);
+                    // Debug.Log("Source: " + weightedEdge.src + ", Destination: " + weightedEdge.dest);
 
                     // Generate Pathway Between Dungeon Cells
                     Cell sourceCell = GetRoomAtPoint(weightedEdge.src);
@@ -156,10 +156,10 @@ public class DungeonGenerator : MonoBehaviour
                         float length = maxY - minY;
 
                         float pathThickness = playerThickness;
-                        Debug.Log("Comparing borderDistance " + borderDistance + " with desired thickness: " + pathThickness);
+                        // Debug.Log("Comparing borderDistance " + borderDistance + " with desired thickness: " + pathThickness);
                         if (borderDistance <= pathThickness) {
                             // Tiny corridor, clear the entire thing out
-                            Debug.Log("borderDistance " + borderDistance + " is less than desired thickness. Expanding to width: " + width);
+                            // Debug.Log("borderDistance " + borderDistance + " is less than desired thickness. Expanding to width: " + width);
                             pathThickness = width - (0.05f); // Account for walls
                         } else {
                             width = pathThickness + (0.05f); // Account for walls
@@ -201,10 +201,10 @@ public class DungeonGenerator : MonoBehaviour
 
                         float pathThickness = playerThickness;
                         
-                        Debug.Log("Comparing borderDistance " + borderDistance + " with desired thickness: " + pathThickness);
+                        // Debug.Log("Comparing borderDistance " + borderDistance + " with desired thickness: " + pathThickness);
                         if (borderDistance <= pathThickness) {
                             // Tiny corridor, clear the entire thing out
-                            Debug.Log("borderDistance " + borderDistance + " is less than desired thickness. Expanding to length: " + length);
+                            // Debug.Log("borderDistance " + borderDistance + " is less than desired thickness. Expanding to length: " + length);
                             pathThickness = length - (0.05f); // Account for walls
                         } else {
                             length = pathThickness + (0.05f);
@@ -239,7 +239,7 @@ public class DungeonGenerator : MonoBehaviour
 
             foreach (Cell room in rooms) {
                 if (room.CanSpawnEnemies()) {
-                    Debug.Log("Starting to spawn enemies in room: " + room.transform.position);
+                    // Debug.Log("Starting to spawn enemies in room: " + room.transform.position);
                     EnemySpawner enemySpawner = room.GetComponent<EnemySpawner>();
                     enemySpawner.SetEnemyDeathAudio(enemyDeathAudio);
                     enemySpawner.SpawnStartingEnemies();

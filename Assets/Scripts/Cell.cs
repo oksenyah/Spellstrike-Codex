@@ -113,11 +113,11 @@ public class Cell : MonoBehaviour {
         Vector3 otherLeftBorder = other.GetBorderVector3("left");
         Vector3 otherRightBorder = other.GetBorderVector3("right");
 
-        Debug.Log("CURRN Top: " + topBorder + ", Bottom: " + bottomBorder + ", Left: " + leftBorder + ", Right: " + rightBorder);
-        Debug.Log("OTHER Top: " + otherTopBorder + ", Bottom: " + otherBottomBorder + ", Left: " + otherLeftBorder + ", Right: " + otherRightBorder);
+        // Debug.Log("CURRN Top: " + topBorder + ", Bottom: " + bottomBorder + ", Left: " + leftBorder + ", Right: " + rightBorder);
+        // Debug.Log("OTHER Top: " + otherTopBorder + ", Bottom: " + otherBottomBorder + ", Left: " + otherLeftBorder + ", Right: " + otherRightBorder);
 
         if (IsOverlappingXAxisWith(other)) {
-            Debug.Log("Is Overlapping on X-Axis");
+            // Debug.Log("Is Overlapping on X-Axis");
             // Get Overlapping Min/Max X
             float minRangeX = Math.Max(leftBorder.x, otherLeftBorder.x);
             float maxRangeX = Math.Min(rightBorder.x, otherRightBorder.x);
@@ -134,7 +134,7 @@ public class Cell : MonoBehaviour {
                 Debug.Log("Unexpected Positions Between Cells!");
             }
         } else if (IsOverlappingYAxisWith(other)) {
-            Debug.Log("Is Overlapping on Y-Axis");
+            // Debug.Log("Is Overlapping on Y-Axis");
             // Get Overlapping Min/Max Y
             float minRangeY = Math.Max(bottomBorder.y, otherBottomBorder.y);
             float maxRangeY = Math.Min(topBorder.y, otherTopBorder.y);
@@ -151,7 +151,7 @@ public class Cell : MonoBehaviour {
                 Debug.Log("Unexpected Positions Between Cells!");
             }
         } else {
-            // L-Shaped Connection
+            // TODO: L-Shaped Connection
             Debug.Log("L-Shaped Connection Detected...");
         }
 
@@ -186,7 +186,7 @@ public class Cell : MonoBehaviour {
 
     public void BuildWalls() {
         float wallOffset = GetWallThickness() / 2;
-        Debug.Log("Wall Offset: " + wallOffset);
+        // Debug.Log("Wall Offset: " + wallOffset);
         Vector3 topWallPosition = transform.position + new Vector3(0, (GetLength() / 2) - wallOffset);
         Vector3 bottomWallPosition = transform.position + new Vector3(0, (-GetLength() / 2) + wallOffset);
         Vector3 leftWallPosition = transform.position + new Vector3((-GetWidth() / 2) + wallOffset, 0);
