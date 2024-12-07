@@ -6,6 +6,7 @@ public class EnemyAI : MonoBehaviour
 {
 
     Enemy character;
+    Pathfinder pathfinder;
 
     [SerializeField] Transform targetTransform;
 
@@ -30,6 +31,7 @@ public class EnemyAI : MonoBehaviour
 
     void Awake() {
         character = GetComponent<Enemy>();
+        pathfinder = GetComponent<Pathfinder>();
 	    charactersLayerMask = LayerMask.GetMask("Characters", "Walls");
         results = new RaycastHit2D[numberOfRays];
         startingVector = Quaternion.Euler(0, 0, Random.Range(0, 360)) * transform.up;
@@ -68,7 +70,7 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    void IdleState(){
+    void IdleState() {
         if (CanSeeTarget()) {
             ChangeState(AttackState);
             return;
@@ -77,7 +79,7 @@ public class EnemyAI : MonoBehaviour
 
     void AttackState() {
         if (targetTransform != null) {
-            character.MoveToward(targetTransform.position);
+            pathfinder.MoveToward(targetTransform.position);
         } else {
             // Debug.Log("Target is null. Wandering...");
             ChangeState(WanderState);
@@ -88,7 +90,7 @@ public class EnemyAI : MonoBehaviour
     void StalkingState() {
         if (targetTransform != null) {
             // Debug.Log("stalking...");
-            character.MoveToward(targetTransform.position);
+            pathfinder.MoveToward(targetTransform.position);
         } else {
             // Debug.Log("Target is null. Wandering...");
             ChangeState(WanderState);
@@ -97,13 +99,13 @@ public class EnemyAI : MonoBehaviour
     }
 
     void WanderState() {
-        if(stateTime == 0){
+        if(stateTime == 0) {
             SetTarget(null);
             wanderPivot = character.transform.position;
             wanderPosition = character.transform.position + new Vector3(Random.Range(-character.GetSightDistance(), character.GetSightDistance()),Random.Range(-character.GetSightDistance(), character.GetSightDistance()));
         }
 
-        character.MoveToward(wanderPosition);
+        pathfinder.MoveToward(wanderPosition);
 
         if (CanSeeTarget()) {
             ChangeState(AttackState);

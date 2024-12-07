@@ -11,7 +11,9 @@ GameObject:
   - component: {fileID: 6365388447331946628}
   - component: {fileID: 3928249913583211720}
   - component: {fileID: 4292932326318875762}
+  - component: {fileID: 9064397524271995808}
   - component: {fileID: 3678559638108306366}
+  - component: {fileID: 7698503998510061960}
   - component: {fileID: 6195209608224878485}
   - component: {fileID: -7097318833869210821}
   - component: {fileID: 4231810430310193378}
@@ -110,6 +112,19 @@ MonoBehaviour:
   lootPrefabs:
   - {fileID: 6895414446476465628, guid: d09681b3e670bb141a6d7917d37c4e68, type: 3}
   lootDropRate: 100
+--- !u!114 &9064397524271995808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7760329319937479664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 912173b9d6808ef469d9a9c05e7b4f47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 0.5
 --- !u!114 &3678559638108306366
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -125,6 +140,18 @@ MonoBehaviour:
   targetTransform: {fileID: 0}
   numberOfRays: 15
   numberOfDegrees: 360
+--- !u!114 &7698503998510061960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7760329319937479664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c4ca5fbcd198a747b449a7f3254de90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!50 &6195209608224878485
 Rigidbody2D:
   serializedVersion: 4

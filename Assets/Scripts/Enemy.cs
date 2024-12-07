@@ -28,38 +28,13 @@ public class Enemy : MonoBehaviour {
         rb = GetComponent<Rigidbody2D>();
     }
 
-    void Cooldown(){
+    void Cooldown() {
         isCoolingDown = true;
         StartCoroutine(CoolingDownRoutine());
-        IEnumerator CoolingDownRoutine(){
+        IEnumerator CoolingDownRoutine() {
             yield return new WaitForSeconds(attackIntervalInSeconds);
             isCoolingDown = false;
         }
-    }
-
-    public void Move(Vector2 offset) {
-        if (offset != Vector2.zero) {
-            offset.Normalize();
-            Vector2 vel = offset *= speed;
-
-            rb.velocity = vel;
-
-            if (offset.x < 0) {
-                spriteRenderer.flipX = true;
-            } else {
-                spriteRenderer.flipX = false;
-            }
-        } else {
-            Stop();
-        }
-    }
-
-    public void Stop() {
-        rb.velocity = Vector2.zero;
-    }
-
-    public void MoveToward(Vector3 position) {
-        Move(position - transform.position);
     }
 
     public float CurrentHealth() {
