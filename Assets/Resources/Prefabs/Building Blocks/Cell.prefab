@@ -100,6 +100,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isStatic: 0
   isRoomCandidate: 0
+  canSpawnEnemies: 1
+  mustSpawnEnemies: 0
   wallPrefab: {fileID: 4319050250460914967, guid: 118fe5acdb6c7084b80a947e059c203d, type: 3}
   wallThickness: 2.5
   minRoomWidth: 2
@@ -123,4 +125,5 @@ MonoBehaviour:
   spawnTime: 5
   startEnemies: 3
   enemyDeathAudio: {fileID: 0}
+  isConfigOverrideable: 1
   timer: 0
