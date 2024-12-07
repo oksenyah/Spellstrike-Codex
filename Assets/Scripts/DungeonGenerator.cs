@@ -14,7 +14,9 @@ public class DungeonGenerator : MonoBehaviour
     private List<GameObject> dungeonBlocks = new List<GameObject>();
     private List<Cell> rooms = new List<Cell>();
     private List<Cell> pathways = new List<Cell>();
-
+    private GameObject loadingScreen;
+    [Header("UI")]
+    [SerializeField] GameObject loadingScreenPrefab;
     [Header("Audio")]
     [SerializeField] AudioSource welcomeToTheDungeonAudio;
     [SerializeField] AudioSource enemyDeathAudio;
@@ -33,10 +35,10 @@ public class DungeonGenerator : MonoBehaviour
     [SerializeField] float maxEnemySpawnIntervalInSeconds = 60f;
     [Header("DungeonItems")]
     [SerializeField] GameObject dungeonBlockPrefab;
-    [SerializeField] GameObject codexPrefab;
     [SerializeField] List<GameObject> staticRooms;
 
     void Awake() {
+        loadingScreen = Instantiate(loadingScreenPrefab, Vector3.zero, Quaternion.identity);
         spawnRadius = numberOfCells / ((float) Math.PI) * 0.3f;
         lehmerRandom = GetComponent<LehmerRandom>();
         dungeonBlocks.AddRange(staticRooms);
@@ -61,8 +63,6 @@ public class DungeonGenerator : MonoBehaviour
         }
 
         SeparateBlocks();
-
-        welcomeToTheDungeonAudio.Play();
     }
 
     private bool IsOverlapping(Transform a, Transform b) {
@@ -96,6 +96,27 @@ public class DungeonGenerator : MonoBehaviour
                     } else {
                         dungeonBlock.GetComponent<SpriteRenderer>().color = Color.gray;
                     }
+
+                    // float xPlayerThickness = 0;
+                    // float yPlayerThickness = 0;
+                    // float randomSeparation = UnityEngine.Random.Range(playerThickness, playerThickness * 2);
+                    // if (separation.x != 0) {
+                    //     if (separation.x < 0) {
+                    //         xPlayerThickness = randomSeparation * -1;
+                    //     } else {
+                    //         xPlayerThickness = randomSeparation;
+                    //     }
+                    // }
+                    // if (separation.y != 0) {
+                        
+                    //     if (separation.y < 0) {
+                    //         yPlayerThickness = randomSeparation * -1;
+                    //     } else {
+                    //         yPlayerThickness = randomSeparation;
+                    //     }
+                    // }
+
+                    // cell.ShiftPosition(separation + new Vector3(xPlayerThickness, yPlayerThickness));
                     cell.ShiftPosition(separation);
                     // yield return new WaitForSeconds(0.01f);
                 }
@@ -428,6 +449,8 @@ public class DungeonGenerator : MonoBehaviour
                 }
             }
 
+            Destroy(loadingScreen);
+            welcomeToTheDungeonAudio.Play();
             yield return null;
         }
     }

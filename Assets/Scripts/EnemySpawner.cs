@@ -22,8 +22,8 @@ public class EnemySpawner : MonoBehaviour
     }
 
     void SpawnEnemyInDungeon() {
-        float halfWidth = dungeonCell.GetWidth() / 2;
-        float halfLength = dungeonCell.GetLength() / 2;
+        float halfWidth = dungeonCell.GetWidth() / 2 - 0.2f;
+        float halfLength = dungeonCell.GetLength() / 2 - 0.2f;
         Vector3 spawnPos = new Vector3(dungeonCell.transform.position.x + Random.Range(-halfWidth, halfWidth), dungeonCell.transform.position.y + Random.Range(-halfLength, halfLength), 0);
         // Debug.Log("Spawning Enemy in Dungeon! Spawn Position: " + spawnPos + ", Cell Position: " + dungeonCell.transform.position);
         GameObject enemyObject = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Count)], spawnPos, Quaternion.identity);
@@ -49,7 +49,9 @@ public class EnemySpawner : MonoBehaviour
     }
 
     public void SetEnemyDeathAudio(AudioSource enemyDeathAudio) {
-        this.enemyDeathAudio = enemyDeathAudio;
+        if (isConfigOverrideable) {
+            this.enemyDeathAudio = enemyDeathAudio;
+        }
     }
 
     public void SetStartingEnemiesCount(int startingEnemiesCount) {

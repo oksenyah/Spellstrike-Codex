@@ -34,6 +34,7 @@ public class EnemyAI : MonoBehaviour
         results = new RaycastHit2D[numberOfRays];
         startingVector = Quaternion.Euler(0, 0, Random.Range(0, 360)) * transform.up;
         spawnPosition = transform.position;
+        ChangeState(WanderState);
     }
 
 
