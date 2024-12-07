@@ -368,16 +368,16 @@ public class Cell : MonoBehaviour {
         List<Wall> wallsToRemove = new List<Wall>();
 
         foreach (Wall wall in walls) {
-            Debug.Log("Checking if vector is within wall...");
+            // Debug.Log("Checking if vector is within wall...");
             if (wall.IsWithinWall(position, this)) {
                 wallsToRemove.Add(wall);
-                Debug.Log("Vector IS within wall! Position: " + position + ", Wall: " + wall.transform.position);
+                // Debug.Log("Vector IS within wall! Position: " + position + ", Wall: " + wall.transform.position);
                 wallsToAdd.AddRange(wall.SplitWall(position, doorThickness));
             }
         }
 
         foreach (Wall wall in wallsToRemove) {
-            Debug.Log("Removing Wall: " + wall.transform.position);
+            // Debug.Log("Removing Wall: " + wall.transform.position);
             walls.Remove(wall);
         }
 

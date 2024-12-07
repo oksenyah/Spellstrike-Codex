@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 5104178820667617618}
   - component: {fileID: 5339323938705581865}
   - component: {fileID: 5353391059307046559}
+  - component: {fileID: -8149517334810934633}
+  - component: {fileID: -4348143489007401456}
   - component: {fileID: 6818265197738428151}
   - component: {fileID: -5766816437124802333}
   m_Layer: 0
@@ -122,8 +124,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetTransform: {fileID: 0}
-  numberOfRays: 15
+  numberOfRays: 9
   numberOfDegrees: 360
+--- !u!114 &-8149517334810934633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7439464352124356945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c4ca5fbcd198a747b449a7f3254de90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-4348143489007401456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7439464352124356945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acbafadbe5afd7648bc3a6b25411f37a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  intervalInSeconds: 0.5
 --- !u!50 &6818265197738428151
 Rigidbody2D:
   serializedVersion: 4
