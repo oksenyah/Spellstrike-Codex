@@ -19,16 +19,20 @@ public class SpellEffect : MonoBehaviour
     private DurableEffect[] effectsToRemove = new DurableEffect[EFFECT_REMOVAL_CACHE_SIZE];
     private SpriteRenderer spriteRenderer;
     private Rigidbody2D rb;
+    private Movement movement;
 
     private Color originalColor;
+    private float originalMovementSpeed;
     private bool isApplyingEffects = false;
     private float worldTime = 0f;
 
     void Awake() {
         spriteRenderer = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
+        movement = GetComponent<Movement>();
 
         originalColor = spriteRenderer.color;
+        originalMovementSpeed = movement.GetMovementSpeed();
     }
 
     void ApplyEffects() {
@@ -60,10 +64,14 @@ public class SpellEffect : MonoBehaviour
             if (effect.color != Color.clear) {
                 spriteRenderer.color = effect.color;
             }
-            // rb.velocity *= effect.scaleMovement;
+            if (movement != null) {
+                movement.SetMovementSpeed(originalMovementSpeed * effect.scaleMovement);
+            }
         } else {
             spriteRenderer.color = originalColor;
-            // rb.velocity = effect.originalVelocity;
+            if (movement != null) {
+                movement.SetMovementSpeed(originalMovementSpeed);
+            }
             Debug.Log("Effect is no longer active!");
             isActive = false;
         }
