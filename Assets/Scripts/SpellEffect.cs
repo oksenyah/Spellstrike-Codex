@@ -58,7 +58,7 @@ public class SpellEffect : MonoBehaviour
     bool ApplyEffect(DurableEffect effect) {
         bool isActive = true;
         effect.currentDurationInSeconds = worldTime - effect.startTimeInSeconds;
-        Debug.Log("effect.currentDurationInSeconds: " + effect.currentDurationInSeconds);
+        // Debug.Log("effect.currentDurationInSeconds: " + effect.currentDurationInSeconds);
         if (effect.currentDurationInSeconds < effect.maxDurationInSeconds) {
             // Apply effect
             if (effect.color != Color.clear) {
@@ -72,7 +72,7 @@ public class SpellEffect : MonoBehaviour
             if (movement != null) {
                 movement.SetMovementSpeed(originalMovementSpeed);
             }
-            Debug.Log("Effect is no longer active!");
+            // Debug.Log("Effect is no longer active!");
             isActive = false;
         }
         return isActive;
@@ -92,7 +92,7 @@ public class SpellEffect : MonoBehaviour
         worldTime += Time.fixedDeltaTime;
         if (!isApplyingEffects) {
             if (activeEffects.Count > 0) {
-                Debug.Log("Applying effects.");
+                // Debug.Log("Applying effects.");
                 ApplyEffects();
             }
         }

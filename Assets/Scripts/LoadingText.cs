@@ -19,17 +19,17 @@ public class LoadingText : MonoBehaviour
 
     void Update() {
         int msSinceLastUpdate = timer.GetMilliSeconds();
-        Debug.Log("msSinceLastUpdate: " + msSinceLastUpdate);
+        // Debug.Log("msSinceLastUpdate: " + msSinceLastUpdate);
         if (msSinceLastUpdate > intervalInMs) {
             if (count < maxEllipseCount) {
-                Debug.Log("Adding Ellipse");
+                // Debug.Log("Adding Ellipse");
                 ellipsesString += ".";
                 count++;
             } else {
-                Debug.Log("Resetting Ellipse");
+                // Debug.Log("Resetting Ellipse");
                 ellipsesString = "";
             }
-            Debug.Log("Resetting Timer");
+            // Debug.Log("Resetting Timer");
             timer.ResetTimer();
         }
         

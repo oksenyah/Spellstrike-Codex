@@ -9,6 +9,7 @@ public class EnemyAI : MonoBehaviour
     Pathfinder pathfinder;
 
     [SerializeField] Transform targetTransform;
+    [SerializeField] string currentStateString = "";
 
     [Header("Config")]
     [SerializeField] int numberOfRays = 45;
@@ -36,28 +37,30 @@ public class EnemyAI : MonoBehaviour
         results = new RaycastHit2D[numberOfRays];
         startingVector = Quaternion.Euler(0, 0, Random.Range(0, 360)) * transform.up;
         spawnPosition = transform.position;
-        ChangeState(WanderState);
+        ChangeState(WanderState, "WanderState");
     }
 
 
     // Start is called before the first frame update
     void Start() {
-        ChangeState(WanderState);
+        ChangeState(WanderState, "WanderState");
     }
 
     public void StartStalkingTarget(Transform targetTransform, bool isStalking) {
         this.isStalking = isStalking;
         this.targetTransform = targetTransform;
-        this.ChangeState(StalkingState);
+        this.ChangeState(StalkingState, "StalkingState");
     }
 
     void SetTarget(Transform targetTransform) {
         this.targetTransform = targetTransform;
     }
 
-    void ChangeState(AIState newAIState){
+    void ChangeState(AIState newAIState, string stateString){
         currentState = newAIState;
+        currentStateString = stateString;
         justChangedState = true;
+        // Debug.Log("Changed State to " + stateString);
     }
 
      bool CanSeeTarget() {
@@ -65,35 +68,35 @@ public class EnemyAI : MonoBehaviour
             return false;
         } else {
             float distanceToTarget = Vector3.Distance(character.transform.position, targetTransform.position);
-            // Debug.Log("Distance to target: " + distanceToTarget);
+            // // Debug.Log("Distance to target: " + distanceToTarget);
             return distanceToTarget <= character.GetSightDistance();
         }
     }
 
     void IdleState() {
         if (CanSeeTarget()) {
-            ChangeState(AttackState);
+            ChangeState(AttackState, "AttackState");
             return;
         }
     }
 
     void AttackState() {
         if (targetTransform != null) {
-            pathfinder.MoveToward(targetTransform.position);
+            pathfinder.SetPathTarget(targetTransform.position);
         } else {
-            // Debug.Log("Target is null. Wandering...");
-            ChangeState(WanderState);
+            // // Debug.Log("Target is null. Wandering...");
+            ChangeState(WanderState, "WanderState");
             return;
         }
     }
 
     void StalkingState() {
         if (targetTransform != null) {
-            // Debug.Log("stalking...");
-            pathfinder.MoveToward(targetTransform.position);
+            // // Debug.Log("stalking...");
+            pathfinder.SetPathTarget(targetTransform.position);
         } else {
-            // Debug.Log("Target is null. Wandering...");
-            ChangeState(WanderState);
+            // // Debug.Log("Target is null. Wandering...");
+            ChangeState(WanderState, "WanderState");
             return;
         }
     }
@@ -105,10 +108,10 @@ public class EnemyAI : MonoBehaviour
             wanderPosition = character.transform.position + new Vector3(Random.Range(-character.GetSightDistance(), character.GetSightDistance()),Random.Range(-character.GetSightDistance(), character.GetSightDistance()));
         }
 
-        pathfinder.MoveToward(wanderPosition);
+        pathfinder.SetPathTarget(wanderPosition);
 
         if (CanSeeTarget()) {
-            ChangeState(AttackState);
+            ChangeState(AttackState, "AttackState");
             return;
         }
 
@@ -140,24 +143,25 @@ public class EnemyAI : MonoBehaviour
         if (targetTransform == null) {
             // Look for a new target
             for (int i = 0; i < numberOfRays; i++) {
-                // Debug.Log("Ray: " + i + ", Delta Angle: " + deltaAngle + ", Distance: " + character.GetSightDistance());
+                // // Debug.Log("Ray: " + i + ", Delta Angle: " + deltaAngle + ", Distance: " + character.GetSightDistance());
                 // var raycastDirection = Quaternion.Euler(0, 0, i * deltaAngle) * transform.up * character.GetSightDistance();
                 var raycastDirection = Quaternion.Euler(0, 0, i * deltaAngle) * startingVector * character.GetSightDistance();
-                // Debug.Log("Raycast direction: " + raycastDirection);
-                Debug.DrawRay(transform.position, raycastDirection, Color.gray);
+                // // Debug.Log("Raycast direction: " + raycastDirection);
+                // Debug.DrawRay(transform.position, raycastDirection, Color.gray);
                 int hitCount = Physics2D.LinecastNonAlloc(transform.position, raycastDirection, results, charactersLayerMask);
                 if (hitCount > 0) {
                     foreach (RaycastHit2D hit in results) {
                         // Hit was detected!
                         if (hit) {
-                            // Debug.Log("Found Tag: " + hit.collider.tag);
-                            // Debug.Log("Distance Between Enemy and Wizard: " + Vector3.Distance(character.transform.position, hit.collider.transform.position));
+                            // // Debug.Log("Found Tag: " + hit.collider.tag);
+                            // // Debug.Log("Distance Between Enemy and Wizard: " + Vector3.Distance(character.transform.position, hit.collider.transform.position));
                             if (Vector3.Distance(character.transform.position, hit.collider.transform.position) <= character.GetSightDistance()) {
                                 if (hit.collider.CompareTag("Wizard")) {
-                                    // Debug.Log("Enemy nearby!!!");
-                                    targetTransform = hit.collider.transform;
+                                    // // Debug.Log("Enemy nearby!!!");
+                                    // targetTransform = hit.collider.transform;
+                                    SetTarget(hit.collider.transform);
                                     targetFound = true;
-                                    Debug.DrawLine(character.transform.position, hit.transform.position, Color.green);
+                                    // Debug.DrawLine(character.transform.position, hit.transform.position, Color.green);
                                     break;
                                 }
                             }
@@ -175,10 +179,10 @@ public class EnemyAI : MonoBehaviour
         
         if (!targetFound) {
             if (!isStalking) {
-                // Debug.Log("Null transform since we are NOT stalking.");
-                targetTransform = null;
+                // // Debug.Log("Null transform since we are NOT stalking.");
+                SetTarget(null);
             } else {
-                // Debug.Log("Not Updating Transform since we are stalking...");
+                // // Debug.Log("Not Updating Transform since we are stalking...");
             }
         }
     }

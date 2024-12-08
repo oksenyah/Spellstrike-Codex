@@ -33,7 +33,7 @@ Transform:
   m_GameObject: {fileID: 7760329319937479664}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 10, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -138,6 +138,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetTransform: {fileID: 0}
+  currentStateString: 
   numberOfRays: 15
   numberOfDegrees: 360
 --- !u!114 &7698503998510061960
@@ -152,6 +153,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c4ca5fbcd198a747b449a7f3254de90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nodeSearchDistance: 1
+  numberOfRays: 8
+  pathGenerationInteravalInSeconds: 1
+  targetDistanceThreshold: 0.25
+  limit: 10
 --- !u!50 &6195209608224878485
 Rigidbody2D:
   serializedVersion: 4

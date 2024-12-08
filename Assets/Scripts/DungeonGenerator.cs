@@ -122,7 +122,7 @@ public class DungeonGenerator : MonoBehaviour
                 }
 
                 if (overlapDetected) {
-                    // Debug.Log("Overlaps detected. Sleeping...");
+                    // // Debug.Log("Overlaps detected. Sleeping...");
                     yield return new WaitForSeconds(0.0001f);
                 }
             }
@@ -146,8 +146,8 @@ public class DungeonGenerator : MonoBehaviour
             List<WeightedEdge> mstEdges = CalculateMST(delaunator);
             foreach (WeightedEdge weightedEdge in mstEdges) {
                 if (weightedEdge != null) {
-                    // Debug.Log("Weighted Edge: " + weightedEdge);
-                    // Debug.Log("Source: " + weightedEdge.src + ", Destination: " + weightedEdge.dest);
+                    // // Debug.Log("Weighted Edge: " + weightedEdge);
+                    // // Debug.Log("Source: " + weightedEdge.src + ", Destination: " + weightedEdge.dest);
 
                     // Generate Pathway Between Dungeon Cells
                     Cell sourceCell = GetRoomAtPoint(weightedEdge.src);
@@ -168,7 +168,7 @@ public class DungeonGenerator : MonoBehaviour
                         Vector3 sourceBorderVector = sourceCell.GetBorderConnectionVector3(destinationCell);
                         Vector3 destinationBorderVector = new Vector3(sourceBorderVector.x, destinationCell.GetBorderConnectionVector3(sourceCell).y);
                         float borderDistance = Vector3.Distance(sourceBorderVector, destinationBorderVector);
-                        Debug.DrawLine(sourceBorderVector, destinationBorderVector, Color.blue, float.PositiveInfinity);
+                        // Debug.DrawLine(sourceBorderVector, destinationBorderVector, Color.blue, float.PositiveInfinity);
 
                         // Add Vertical Pathway
                         float minX = Math.Max(sourceLeftBorder.x, destinationLeftBorder.x);
@@ -182,16 +182,16 @@ public class DungeonGenerator : MonoBehaviour
                         float length = maxY - minY;
 
                         float pathThickness = playerThickness;
-                        // Debug.Log("Comparing borderDistance " + borderDistance + " with desired thickness: " + pathThickness);
+                        // // Debug.Log("Comparing borderDistance " + borderDistance + " with desired thickness: " + pathThickness);
                         if (borderDistance <= pathThickness) {
                             // Tiny corridor, clear the entire thing out
-                            // Debug.Log("borderDistance " + borderDistance + " is less than desired thickness. Expanding to width: " + width);
+                            // // Debug.Log("borderDistance " + borderDistance + " is less than desired thickness. Expanding to width: " + width);
                             pathThickness = width - (0.05f); // Account for walls
                         } else {
                             width = pathThickness + (0.05f); // Account for walls
                         }
 
-                        // Debug.Log("Pathway Dimensions, Width: " + width + ", Length: " + length + ", X: " + xMidPoint + ", Y: " + yMidPoint);
+                        // // Debug.Log("Pathway Dimensions, Width: " + width + ", Length: " + length + ", X: " + xMidPoint + ", Y: " + yMidPoint);
 
                         GameObject dungeonBlock = Instantiate(dungeonBlockPrefab, new Vector3(xMidPoint, yMidPoint, 0), Quaternion.identity);
                         dungeonBlock.GetComponent<SpriteRenderer>().color = Color.grey;
@@ -212,7 +212,7 @@ public class DungeonGenerator : MonoBehaviour
                         Vector3 sourceBorderVector = sourceCell.GetBorderConnectionVector3(destinationCell);
                         Vector3 destinationBorderVector = new Vector3(destinationCell.GetBorderConnectionVector3(sourceCell).x, sourceBorderVector.y);
                         float borderDistance = Vector3.Distance(sourceBorderVector, destinationBorderVector);
-                        Debug.DrawLine(sourceBorderVector, destinationBorderVector, Color.blue, float.PositiveInfinity);
+                        // Debug.DrawLine(sourceBorderVector, destinationBorderVector, Color.blue, float.PositiveInfinity);
 
                         // Add Horizontal Pathway
                         float minX = Math.Max(sourceLeftBorder.x, destinationLeftBorder.x);
@@ -227,18 +227,18 @@ public class DungeonGenerator : MonoBehaviour
 
                         float pathThickness = playerThickness;
                         
-                        // Debug.Log("Comparing borderDistance " + borderDistance + " with desired thickness: " + pathThickness);
+                        // // Debug.Log("Comparing borderDistance " + borderDistance + " with desired thickness: " + pathThickness);
                         if (borderDistance <= pathThickness) {
                             // Tiny corridor, clear the entire thing out
-                            // Debug.Log("borderDistance " + borderDistance + " is less than desired thickness. Expanding to length: " + length);
+                            // // Debug.Log("borderDistance " + borderDistance + " is less than desired thickness. Expanding to length: " + length);
                             pathThickness = length - (0.05f); // Account for walls
                         } else {
                             length = pathThickness + (0.05f);
                         }
 
-                        // Debug.Log("SOURCE Top: " + sourceTopBorder + ", Bottom: " + sourceBottomBorder + ", Left: " + sourceLeftBorder + ", Right: " + sourceRightBorder);
-                        // Debug.Log("DESTIN Top: " + destinationTopBorder + ", Bottom: " + destinationBottomBorder + ", Left: " + destinationLeftBorder + ", Right: " + destinationRightBorder);
-                        // Debug.Log("Pathway Dimensions, Width: " + width + ", Length: " + length + ", X: " + xMidPoint + ", Y: " + yMidPoint);
+                        // // Debug.Log("SOURCE Top: " + sourceTopBorder + ", Bottom: " + sourceBottomBorder + ", Left: " + sourceLeftBorder + ", Right: " + sourceRightBorder);
+                        // // Debug.Log("DESTIN Top: " + destinationTopBorder + ", Bottom: " + destinationBottomBorder + ", Left: " + destinationLeftBorder + ", Right: " + destinationRightBorder);
+                        // // Debug.Log("Pathway Dimensions, Width: " + width + ", Length: " + length + ", X: " + xMidPoint + ", Y: " + yMidPoint);
 
                         GameObject dungeonBlock = Instantiate(dungeonBlockPrefab, new Vector3(xMidPoint, yMidPoint, 0), Quaternion.identity);
                         dungeonBlock.GetComponent<SpriteRenderer>().color = Color.grey;
@@ -248,9 +248,9 @@ public class DungeonGenerator : MonoBehaviour
                         cell.BuildWalls();
 
                         // Punch out paths
-                        // Debug.Log("Punching out door on source cell at Vector: " + sourceBorderVector);
+                        // // Debug.Log("Punching out door on source cell at Vector: " + sourceBorderVector);
                         sourceCell.AddDoor(sourceBorderVector, pathThickness);
-                        // Debug.Log("Punching out door on destination cell at Vector: " + destinationBorderVector);
+                        // // Debug.Log("Punching out door on destination cell at Vector: " + destinationBorderVector);
                         destinationCell.AddDoor(destinationBorderVector, pathThickness);
                         cell.AddDoor(sourceBorderVector, pathThickness);
                         cell.AddDoor(destinationBorderVector, pathThickness);
@@ -258,7 +258,7 @@ public class DungeonGenerator : MonoBehaviour
                         pathways.Add(cell);
                     } else {
                         // L-Connector Across Closest Corners
-                        Debug.DrawLine(weightedEdge.src.ToVector3(), weightedEdge.dest.ToVector3(), Color.blue, float.PositiveInfinity);
+                        // Debug.DrawLine(weightedEdge.src.ToVector3(), weightedEdge.dest.ToVector3(), Color.blue, float.PositiveInfinity);
 
                         Vector3 sourceBorderVector = sourceCell.GetBorderConnectionVector3(destinationCell);
                         Vector3 destinationBorderVector = destinationCell.GetBorderConnectionVector3(sourceCell);
@@ -284,7 +284,7 @@ public class DungeonGenerator : MonoBehaviour
                         if (rightToLeft && bottomToTop) {
                             if (sourceBorderVector.x == sourceRightBorder.x) {
                                 // source on right, dest on top
-                                Debug.Log("source on right, dest on top");
+                                // // Debug.Log("source on right, dest on top");
                                 cornerVector = new Vector3(destinationBorderVector.x, sourceBorderVector.y);
                                 sourceWidth = cornerVector.x - sourceBorderVector.x + (pathThickness / 2);
                                 destinationLength = cornerVector.y - destinationBorderVector.y - (pathThickness / 2);
@@ -297,7 +297,7 @@ public class DungeonGenerator : MonoBehaviour
                                 connectorDoorY = sourceBorderVector.y - halfPathOffset;
                             } else {
                                 // source on bottom, dest on right
-                                Debug.Log("source on bottom, dest on right");
+                                // Debug.Log("source on bottom, dest on right");
                                 cornerVector = new Vector3(sourceBorderVector.x, destinationBorderVector.y);
                                 sourceLength = sourceBorderVector.y - cornerVector.y + (pathThickness / 2);
                                 destinationWidth = destinationBorderVector.x - cornerVector.x - (pathThickness / 2);
@@ -312,7 +312,7 @@ public class DungeonGenerator : MonoBehaviour
                         } else if (rightToLeft && !bottomToTop) {
                             if (sourceBorderVector.x == sourceRightBorder.x) {
                                 // source on right, dest on bottom
-                                Debug.Log("source on right, dest on bottom");
+                                // Debug.Log("source on right, dest on bottom");
                                 cornerVector = new Vector3(destinationBorderVector.x, sourceBorderVector.y);
                                 sourceWidth = cornerVector.x - sourceBorderVector.x + (pathThickness / 2);
                                 destinationLength = destinationBorderVector.y - cornerVector.y - (pathThickness / 2);
@@ -325,7 +325,7 @@ public class DungeonGenerator : MonoBehaviour
                                 connectorDoorY = sourceBorderVector.y + halfPathOffset;
                             } else {
                                 // source on top, dest on left
-                                Debug.Log("source on top, dest on left");
+                                // Debug.Log("source on top, dest on left");
                                 cornerVector = new Vector3(sourceBorderVector.x, destinationBorderVector.y);
                                 sourceLength = cornerVector.y - sourceBorderVector.y + (pathThickness / 2);
                                 destinationWidth = destinationBorderVector.x - cornerVector.x - (pathThickness / 2);
@@ -340,7 +340,7 @@ public class DungeonGenerator : MonoBehaviour
                         } else if (!rightToLeft && !bottomToTop) {
                             if (sourceBorderVector.x == sourceLeftBorder.x) {
                                 // source on left, dest on bottom
-                                Debug.Log("source on left, dest on bottom");
+                                // Debug.Log("source on left, dest on bottom");
                                 cornerVector = new Vector3(destinationBorderVector.x, sourceBorderVector.y);
                                 sourceWidth = sourceBorderVector.x - cornerVector.x + (pathThickness / 2);
                                 destinationLength = destinationBorderVector.y - cornerVector.y - (pathThickness / 2);
@@ -353,7 +353,7 @@ public class DungeonGenerator : MonoBehaviour
                                 connectorDoorY = sourceBorderVector.y + halfPathOffset;
                             } else {
                                 // source on top, dest on right
-                                Debug.Log("source on top, dest on right");
+                                // Debug.Log("source on top, dest on right");
                                 cornerVector = new Vector3(sourceBorderVector.x, destinationBorderVector.y);
                                 sourceLength = cornerVector.y - sourceBorderVector.y + halfPathOffset;
                                 destinationWidth = cornerVector.x - destinationBorderVector.x - halfPathOffset;
@@ -368,7 +368,7 @@ public class DungeonGenerator : MonoBehaviour
                         } else if (!rightToLeft && bottomToTop) {
                             if (sourceBorderVector.x == sourceLeftBorder.x) {
                                 // source on left, dest on top
-                                Debug.Log("source on left, dest on top");
+                                // Debug.Log("source on left, dest on top");
                                 cornerVector = new Vector3(destinationBorderVector.x, sourceBorderVector.y);
                                 sourceWidth = sourceBorderVector.x - cornerVector.x + halfPathOffset;
                                 destinationLength = cornerVector.y - destinationBorderVector.y - halfPathOffset;
@@ -381,7 +381,7 @@ public class DungeonGenerator : MonoBehaviour
                                 connectorDoorY = sourceBorderVector.y - halfPathOffset;
                             } else {
                                 // source on bottom, dest on right
-                                Debug.Log("source on bottom, dest on right");
+                                // Debug.Log("source on bottom, dest on right");
                                 cornerVector = new Vector3(sourceBorderVector.x, destinationBorderVector.y);
                                 sourceLength = sourceBorderVector.y - cornerVector.y + halfPathOffset;
                                 destinationWidth = cornerVector.x - destinationBorderVector.x - halfPathOffset;
@@ -394,10 +394,10 @@ public class DungeonGenerator : MonoBehaviour
                                 connectorDoorY = destinationBorderVector.y;
                             }
                         } else {
-                            Debug.Log("Unknown State");
+                            // Debug.Log("Unknown State");
                         }
 
-                        Debug.Log("Corner Vector: " + cornerVector);
+                        // Debug.Log("Corner Vector: " + cornerVector);
 
                         Debug.DrawLine(sourceBorderVector, cornerVector, Color.blue, float.PositiveInfinity);
                         Debug.DrawLine(destinationBorderVector, cornerVector, Color.blue, float.PositiveInfinity);
@@ -438,7 +438,7 @@ public class DungeonGenerator : MonoBehaviour
                 if (room.CanSpawnEnemies()) {
 
                     if (UnityEngine.Random.Range(0.0f, 1f) <= roomSpawnsEnemiesPercentage || room.MustSpawnEnemies()) {
-                        // Debug.Log("Starting to spawn enemies in room: " + room.transform.position);
+                        // // Debug.Log("Starting to spawn enemies in room: " + room.transform.position);
                         EnemySpawner enemySpawner = room.GetComponent<EnemySpawner>();
                         enemySpawner.SetEnemyDeathAudio(enemyDeathAudio);
                         enemySpawner.SetStartingEnemiesCount(UnityEngine.Random.Range(minStartingEnemiesPerRoom, maxStartingEnemiesPerRoom));

@@ -129,7 +129,7 @@ public class Cell : MonoBehaviour {
                 // Above Other Cell
                 y = bottomBorder.y;
             } else {
-                Debug.Log("Unexpected Positions Between Cells!");
+                // Debug.Log("Unexpected Positions Between Cells!");
             }
         } else if (IsOverlappingYAxisWith(other)) {
             // Debug.Log("Is Overlapping on Y-Axis");
@@ -146,11 +146,10 @@ public class Cell : MonoBehaviour {
                 // Right of Other Cell
                 x = leftBorder.x;
             } else {
-                Debug.Log("Unexpected Positions Between Cells!");
+                // Debug.Log("Unexpected Positions Between Cells!");
             }
         } else {
-            // TODO: L-Shaped Connection
-            Debug.Log("L-Shaped Connection Detected...");
+            // Debug.Log("L-Shaped Connection Detected...");
             Vector3 cornerVector = Vector3.zero;
             Vector3 otherCornerVector = Vector3.zero;
             bool isTopBorderConnection = true;
@@ -176,7 +175,7 @@ public class Cell : MonoBehaviour {
                 // Top Right Corner
                 cornerVector = new Vector3(rightBorder.x, topBorder.y);
                 otherCornerVector = new Vector3(otherLeftBorder.x, otherBottomBorder.y);
-                Debug.Log("Top Right Corner: " + cornerVector);
+                // Debug.Log("Top Right Corner: " + cornerVector);
                 float cornerPositionFromLine = DistanceFromLine(transform.position, other.transform.position, cornerVector);
                 float otherCornerPositionFromLine = DistanceFromLine(transform.position, other.transform.position, otherCornerVector);
                 float direction = cornerPositionFromLine;
@@ -205,7 +204,7 @@ public class Cell : MonoBehaviour {
                 // Top Left Corner
                 cornerVector = new Vector3(leftBorder.x, topBorder.y);
                 otherCornerVector = new Vector3(otherRightBorder.x, otherBottomBorder.y);
-                Debug.Log("Top Left Corner: " + cornerVector);
+                // Debug.Log("Top Left Corner: " + cornerVector);
                 float cornerPositionFromLine = DistanceFromLine(transform.position, other.transform.position, cornerVector);
                 float otherCornerPositionFromLine = DistanceFromLine(transform.position, other.transform.position, otherCornerVector);
                 float direction = cornerPositionFromLine;
@@ -213,10 +212,10 @@ public class Cell : MonoBehaviour {
                 if (Mathf.Abs(cornerPositionFromLine) < Mathf.Abs(otherCornerPositionFromLine)) {
                     // Compare magnitudes and go with the stronger one
                     direction = otherCornerPositionFromLine;
-                    Debug.Log("Switching to other corner's direction");
+                    // Debug.Log("Switching to other corner's direction");
                 }
 
-                Debug.Log("Direction: " + direction + ", Corner Distance From Line: " + cornerPositionFromLine + ", Other Corner Distance From Line: " + otherCornerPositionFromLine);
+                // Debug.Log("Direction: " + direction + ", Corner Distance From Line: " + cornerPositionFromLine + ", Other Corner Distance From Line: " + otherCornerPositionFromLine);
 
                 if (direction > 0) {
                     // Border on top
@@ -236,7 +235,7 @@ public class Cell : MonoBehaviour {
                 // Bottom Left Corner
                 cornerVector = new Vector3(leftBorder.x, bottomBorder.y);
                 otherCornerVector = new Vector3(otherRightBorder.x, otherTopBorder.y);
-                Debug.Log("Bottom Left Corner: " + cornerVector);
+                // Debug.Log("Bottom Left Corner: " + cornerVector);
                 float cornerPositionFromLine = DistanceFromLine(transform.position, other.transform.position, cornerVector);
                 float otherCornerPositionFromLine = DistanceFromLine(transform.position, other.transform.position, otherCornerVector);
                 float direction = cornerPositionFromLine;
@@ -263,7 +262,7 @@ public class Cell : MonoBehaviour {
                 // Bottom Right Corner
                 cornerVector = new Vector3(rightBorder.x, bottomBorder.y);
                 otherCornerVector = new Vector3(otherLeftBorder.x, otherTopBorder.y);
-                Debug.Log("Bottom Right Corner: " + cornerVector);
+                // Debug.Log("Bottom Right Corner: " + cornerVector);
 		        float cornerPositionFromLine = DistanceFromLine(transform.position, other.transform.position, cornerVector);
                 float otherCornerPositionFromLine = DistanceFromLine(transform.position, other.transform.position, otherCornerVector);
                 float direction = cornerPositionFromLine;
@@ -288,12 +287,12 @@ public class Cell : MonoBehaviour {
                 }
 
             } else {
-                Debug.Log("Unknown State!");
+                // Debug.Log("Unknown State!");
             }
         }
 
         borderVector = new Vector3(x, y);
-        Debug.Log("Border Vector: " + borderVector);
+        // Debug.Log("Border Vector: " + borderVector);
 
         return borderVector;
     }

@@ -24,7 +24,15 @@ The main menu background was generated with OpenAI.
 
 - <https://github.com/YourRobotOverlord/LehmerRandom/tree/master>
 
+## Delauney Triangulation
+
+- <https://github.com/nol1fe/delaunator-sharp/tree/master>
+
 ## Kruskal's Minimum Spanning Tree Algorithm
 
 - <https://www.geeksforgeeks.org/kruskals-minimum-spanning-tree-algorithm-greedy-algo-2/>
 - <https://www.tutorialspoint.com/data_structures_algorithms/kruskals_spanning_tree_algorithm.htm>
+
+## A* Search
+
+- <https://www.geeksforgeeks.org/a-search-algorithm/>
